@@ -6,7 +6,6 @@ function [rect,textLabel] = annotate512Transect(x,y,number,colour,text_colour,te
 % colour is the colour of the square
 % text_bg is either 1 or 0 to determine the prescence or absence of a white
 % text background
-
     rect = drawRect(x,y,colour);
     textLabel = addNumberLabel(x, y, number, text_colour, text_bg);
 end
