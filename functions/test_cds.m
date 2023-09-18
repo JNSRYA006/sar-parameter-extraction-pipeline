@@ -36,6 +36,14 @@ V_10_t = permute(V_10, [2 1 3]);
 [transectData, startPos] = get512Transects(data_VV_2,1,1,20,n);
 [transectData2, startPos2] = get512Transects(data_VV_2,1,1,45,n);
 
+%% Test Heading plot
+% Single heading value (in degrees)
+heading = deg2rad(90 - 344.3488); % Replace with your desired heading angle
+
+% Create a unit vector based on the heading angle
+u = cos(heading); % Calculate x-component of the unit vector
+v = sin(heading); % Calculate y-component of the unit vector
+
 %% World map plot
 plotOnMapWind(long,lat,U_10_t,V_10_t,data_VV);
 % worldmap('World')
@@ -70,6 +78,7 @@ quiver(long,lat,U_10_t(:,:,1),V_10_t(:,:,1),'b','LineWidth',1)
 hold on;
 % Vector plot of second time frame
 quiver(long,lat,U_10_t(:,:,2),V_10_t(:,:,2),'r','LineWidth',1)
+%quiver(17.6424, -34.0603, u, v, 'bl', 'LineWidth', 2); % Assuming origin at (centre_lon, centre_lat)
 hold off;
 
 %% Hard coded test

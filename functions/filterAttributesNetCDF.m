@@ -1,13 +1,20 @@
-function metadata = filterAttributesH5(metadata_struc, attribute)
-% filterAttributesH5 takes in a structure containing metadata (obtained
-% using the getMetadataH5 function), as well as a list of strings of the
+function metadata = filterAttributesNetCDF(metadata_struc, attribute)
+% filterAttributesNetCDF takes in a structure containing metadata (obtained
+% using meta_nc = ncinfo(filepath','metadata');), as well as a list of strings of the
 % desired attributes to filter. A list of available attribute types are
 % available here: 
 % The function outputs a 1xlength(attributes) structure with all the
 % original metadata columns preserved
+prefix = 'Abstracted_Metadata:';
 attributes = split(attribute, ',');
 num_attributes = length(attributes);
 metadata = struct([]);
+
+%% Update attribute array to include prefix for abstracted metadata
+attribute_update = strings(size(num_attributes));
+for i=1:num_attributes
+    attribute_update(i) = prefix + attribute(i);
+end
 
 %% Check if attribute is part of the structure
 % if ~isfield(metadata_struc, attribute)
@@ -17,11 +24,17 @@ metadata = struct([]);
 
 %% Extract input attributes and filter out columns
 for i = 1:num_attributes
-    index = strcmp({metadata_struc.Name}, attributes(i));
+    index = strcmp({metadata_struc.Name}, attribute_update(i));
     metadata = [metadata, metadata_struc(index)];
 end
 
-%% Remove empty rows
+%% Remove empty rows and prefix
+%metadata.Name = attributes;
+for i = 1:num_attributes
+    % Remove the common prefix by indexing the string
+    metadata(i).Name = attributes(i);
+end
+
 metadata = removeEmptyRows(metadata);
 end
 

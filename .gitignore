@@ -2,3 +2,5 @@
 *.asv
 # netCDF data
 *.nc
+# GRiB2 data
+*.grib2
