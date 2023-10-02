@@ -15,7 +15,7 @@ req_atributes = ["MISSION","orbit_cycle","first_line_time","antenna_pointing","P
 meta_nc = filterAttributesNetCDF(meta_nc.Attributes, req_atributes);
 
 figure(1)
-imshow(VV_nc.')
+imshow(VV_nc)
 hold on;
 
 for i = 1:n

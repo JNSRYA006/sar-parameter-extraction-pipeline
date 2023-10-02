@@ -1,6 +1,6 @@
 function struc = getGribStruct(wgrib2Path,GribPath)
 
-OutputColumns = ["latitude", "longitude", "time", "significantWaveHeight", "significantWavePeriod", "direction"];
+OutputColumns = ["latitude", "longitude", "time", "significantWaveHeight", "significantWavePeriod", "direction", "windSpeed", "windDirection"];
 str = dir(strcat(GribPath,'\*.grib2'));
 S = struct();
 for i = 1:length(OutputColumns)
@@ -39,6 +39,8 @@ for i = 1:length(str)
     S(i).significantWaveHeight = ncread(output_file,'WVHGT_surface');
     S(i).significantWavePeriod = ncread(output_file,'WVPER_surface');
     S(i).direction = ncread(output_file,'WVDIR_surface');
+    S(i).windSpeed = ncread(output_file,'WIND_surface');
+    S(i).windDirection = ncread(output_file,'WDIR_surface');
     delete(output_file)
 end
 

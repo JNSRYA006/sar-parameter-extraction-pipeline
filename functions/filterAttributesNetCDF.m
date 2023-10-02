@@ -11,7 +11,7 @@ num_attributes = length(attributes);
 metadata = struct([]);
 
 %% Update attribute array to include prefix for abstracted metadata
-attribute_update = strings(size(num_attributes));
+attribute_update = strings(num_attributes);
 for i=1:num_attributes
     attribute_update(i) = prefix + attribute(i);
 end

@@ -1,28 +1,22 @@
 %% From Metadata Test
-smaller_subset_data = 'D:\UCT\EEE4022S\Data\CPT\largerSubset\Sigma0_VV.hdr';
-lat_long_subset = 'D:\UCT\EEE4022S\Data\CPT\lat_long_test\Sigma0_VV.hdr';
-str2 = readEnviHdr(lat_long_subset);
-str = readEnviHdr(smaller_subset_data);
-%datasetName ="reanalysis-era5-single-levels";
-
+% Import data
+filepath = "D:\UCT\EEE4022S\Data\CPT\small_subset.nc";
 % Number of Transects
-n = 8;
+n = 2;
 
-data_VV = multibandread(str.file,str.size,str.data_type,str.header_offset,str.interleave,str.byte_order);
-data_VV_2 = multibandread(str2.file,str2.size,str2.data_type,str2.header_offset,str2.interleave,str2.byte_order);
+% Import data values
+ncImport = ncinfo(filepath);
+VV_nc = ncread(filepath,'Sigma0_VV');
+[transectData_nc, startPos_nc] = get512Transects(VV_nc,1,1,20,n);
+[transectData2_nc, startPos2] = get512Transects(VV_nc,1,1,45,n);
 
-% Get metadata
-fileLoc_H5 = 'D:\UCT\EEE4022S\Data\CPT\lat_long_test\lat_long_subset.h5';
-testOut = getMetadataH5(fileLoc_H5, 'abstracted');
-testOutAtr = testOut.Attributes;
-
-attribute_names = ["first_line_time","first_near_lat", "first_near_long","first_far_lat", "first_far_long", "last_near_lat", "last_near_long","last_far_lat", "last_far_long"];
-test_output = filterAttributesH5(testOutAtr,attribute_names);
-test_meta_val = getAttributeValH5(test_output,attribute_names);
-test_meta_val_for_inv = readMetadata(testOutAtr);
+% Required Metadata
+meta_nc = ncinfo(filepath,'metadata');
+req_atributes = ["first_near_lat","first_near_long","first_far_lat","first_far_long","last_near_lat","last_near_long","last_far_lat","last_far_long","centre_lat","centre_lon", "num_output_lines","num_samples_per_line","first_line_time"];
+meta_nc = filterAttributesNetCDF(meta_nc.Attributes, req_atributes);
 %% Break
 % Get CDS Data from metadata
-[U_10,V_10,long,lat,t,citation] = getWindVectorCDS(test_meta_val);
+[U_10,V_10,long,lat,t,citation,directional,peakedness] = getWindVectorCDS(filepath);
 
 disp(citation);
 
@@ -32,9 +26,6 @@ V_10_t = permute(V_10, [2 1 3]);
 %long_t = long.';
 %lat_t = lat.';
 
-% Plot data
-[transectData, startPos] = get512Transects(data_VV_2,1,1,20,n);
-[transectData2, startPos2] = get512Transects(data_VV_2,1,1,45,n);
 
 %% Test Heading plot
 % Single heading value (in degrees)
@@ -44,16 +35,33 @@ heading = deg2rad(90 - 344.3488); % Replace with your desired heading angle
 u = cos(heading); % Calculate x-component of the unit vector
 v = sin(heading); % Calculate y-component of the unit vector
 
-%% World map plot
-plotOnMapWind(long,lat,U_10_t,V_10_t,data_VV);
-% worldmap('World')
-% load coastlines
-% plotm(coastlat,coastlon)
-
+%% Mmap plot
+% figure(1)
+% 
+% m_proj('miller','lat',[min(lat(:)) max(lat(:))],...
+% 'lon',[min(lon(:)) max(lon(:))])
+% 
+% Next, plot the field using the M_MAP version of pcolor.
+% 
+% m_pcolor(lon,lat,waveHeight.');
+% shading flat;
+% 
+% Add a coastline and axis values.
+% 
+% m_coast('patch',[.7 .7 .7])
+% m_grid('box','fancy')
+% 
+% ax.YLabel.String='Wind speeds m/s';
+% 
+% 
+% Add a colorbar and title.
+% 
+% colorbar
+% title('WAVEWATCH III Wavenumber from NOMADS');
 
 %% Plots
 figure(1)
-imshow(data_VV_2)
+imshow(VV_nc)
 h = gca;
 h.Visible = 'On';
 hold on;
@@ -65,7 +73,7 @@ wind_time_2 = quiver(long,lat,U_10_t(:,:,2),V_10_t(:,:,2),'r','LineWidth',1);
 legend([wind_time_1, wind_time_2], ['Wind at: ', '17:00'], ['Wind at: ', '18:00']);
 % Plot rectangles of transects
 for i = 1:n
-    annotate512Transect(startPos(i,1),startPos(i,2),i,'w','black',1);
+    annotate512Transect(startPos_nc(i,1),startPos_nc(i,2),i,'w','black',1);
     annotate512Transect(startPos2(i,1),startPos2(i,2),i,'r','r',0);
 end
 
