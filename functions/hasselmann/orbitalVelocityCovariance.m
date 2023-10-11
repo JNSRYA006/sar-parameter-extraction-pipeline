@@ -1,4 +1,4 @@
-function [f_v_r] = orbitalVelocityCovariance(k,k_y,waveSpectrum,SARmetadata,th,r)
+function [f_v_r] = orbitalVelocityCovariance(k,k_y,waveSpectrum,SARmetadata,r,th)
 
 % Need:
 % - F(k)
@@ -15,67 +15,63 @@ function [f_v_r] = orbitalVelocityCovariance(k,k_y,waveSpectrum,SARmetadata,th,r
 % x-axis = SAR flight direction (azimuthal) (heading)
 
 %% Get required metadata
-[look,inc_near,inc_far,num_pixels] = getMetadata_f_v_r(SARmetadata);
-% Update metadata function to general get look
-%th = ncread(metadata.Filename,"Incidence_Angle"); % Check this works when
-%I have hardrive
 func = helperFunctions;
+look = func.getLook(SARmetadata);
+% Update metadata function to general get look
+%th = ncread(SARmetadata.Filename,"Incidence_Angle");
 
-%look = lookDiscretise(look);
 look = func.look(look);
 
-%th = func.incidence(inc_near,inc_far,num_pixels);
-%th = extrapolateIncidence(inc_near,inc_far,num_pixels); % Need to calculate based on velocity and look time
 % Need to check resizing is correct
-k_new = func.resize(k,th(1,:));
-k_y = func.resize(k_y,th(1,:));
+%k_new = func.resize(k,th(1,:));
+k_new = k;
+%k_y = func.resize(k_y,th(1,:));
 k_l = func.kl(look,k_y);
 omega = func.omega(k_new);
 %% Could be wrong
-% Create a logical mask for rows with NaN entries
-nanRows = any(isnan(waveSpectrum), 2);
+% Create logical masks for NaN rows and NaN columns
+nanRows = any(isnan(waveSpectrum), 2); % For NaN rows
+nanCols = any(isnan(waveSpectrum), 1); % For NaN columns
 
-% Remove rows with NaN entries
-waveSpectrum = waveSpectrum(~nanRows, :);
+% Find row indices where NaN rows exist
+nanRowIndices = find(nanRows);
 
-waveSpectrum = func.resize(waveSpectrum,zeros(2001,2001));
+% nanRowIndices will now contain the row indices of NaN rows
+% Initialize masks of zeros with the same size as waveSpectrum
+nanRowsMask = zeros(size(waveSpectrum));
+nanColsMask = zeros(size(waveSpectrum));
+
+% Set 1s in the masks where NaN values are in waveSpectrum
+nanRowsMask(:,1) = 1;
+nanColsMask(1,:) = 1;
+
+% Now nanRowsMask and nanColsMask have 1s where NaN values are in waveSpectrum
+
+% Remove NaN values manually
+waveSpectrum = waveSpectrum(2:end,2:end);
+
+% Resize the matrix to 2001x2001
+waveSpectrum = func.resize(waveSpectrum,th);
 Tv_k = func.rangeVelocityTF(omega,th,k_l,k_new);
-
-% k_new = resizeToSameSize(k,th);
-% k_y = resizeToSameSize(k_y,th);
-% k_l = defineKLook(look,k_y);
-% omega = defineOmega(k_new);
-% waveSpectrum = resizeToSameSize(waveSpectrum,zeros(2001,2001));
+Tv_k = func.resize(Tv_k(:,2:end),waveSpectrum);
 
 for i=2:length(k)
     dk(i) = k(i)-k(i-1);
 end
 dk = dk(2:end);
 dk = mean(dk);
+
+for i=2:length(th)
+    dth(i) = th(i)-th(i-1);
+end
+dth = dth(2:end);
+dth = mean(dth);
 % Figure out r value!!
 %r = ones(2001);
-
+%f_v_r = cumtrapz(waveSpectrum.*abs(Tv_k).^2).*dth;
 f_v_r = cumtrapz(waveSpectrum.*abs(Tv_k).^2.*exp(1i.*k_new.*r)).*dk;
 
-%f_v_r = integral(waveSpectrum*abs(Tv_k(omega,th,k_l,k)).^2.*exp(1i.*k.*r));
-% %% Single heading value (in degrees)
-% heading = deg2rad(90 - 344.3488); % Replace with your desired heading angle
-% 
-% % Create a unit vector based on the heading angle
-% u = cos(heading); % Calculate x-component of the unit vector
-% v = sin(heading); % Calculate y-component of the unit vector
-% quiver(17.6424, -34.0603, u, v, 'bl', 'LineWidth', 2); % Assuming origin at (centre_lon, centre_lat)
-
-%f_v_r = 0;
 end
 
-function [look,incidence_near,incidence_far,num_pixels] = getMetadata_f_v_r(metadata)
-    req_atributes = ["antenna_pointing","incidence_near","incidence_far","num_output_lines"];
-    meta_fvr = filterAttributesNetCDF(metadata.Attributes, req_atributes);
-    look = meta_fvr(1).Value;
-    incidence_near = meta_fvr(2).Value;
-    incidence_far = meta_fvr(3).Value;
-    num_pixels = meta_fvr(4).Value;
-end
 
 

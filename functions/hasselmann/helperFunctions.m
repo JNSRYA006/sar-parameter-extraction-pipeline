@@ -1,12 +1,17 @@
 function fh = helperFunctions
 fh.incidence = @extrapolateIncidence;
 fh.look = @lookDiscretise;
+fh.getLook = @getLook;
+fh.getPolarisation = @getPolarisation;
 fh.kl = @defineKLook;
 fh.omega = @defineOmega;
 fh.resize = @resizeToSameSize;
 fh.tiltMTF = @tiltMTF;
 fh.hydroMTF = @hydrodynamicMTF;
 fh.rangeVelocityTF = @rangeVelocityTF;
+fh.rarMTF = @rarMTF;
+fh.velocityBunchingMTF = @velocityBunchingMTF;
+fh.sarImagingMTF = @sarImagingMTF;
 end
 
 function incidence = extrapolateIncidence(incidence_near,incidence_far,num_pixels)
@@ -23,6 +28,22 @@ function incidence = extrapolateIncidence(incidence_near,incidence_far,num_pixel
 
     incidence = linspace(incidence_near,incidence_far,num_pixels);
 
+end
+
+
+function polarisation = getPolarisation(metadata)
+    reqAttributes = ["mds1_tx_rx_polar","mds2_tx_rx_polar"];
+    meta_polar = filterAttributesNetCDF(metadata.Attributes, reqAttributes);
+    polarisation = ["",""];
+    polarisation(1) = meta_polar(1).Value;
+    polarisation(2) = meta_polar(2).Value;    
+
+end
+
+function look = getLook(metadata)
+    reqAttributes = "antenna_pointing";
+    meta_look = filterAttributesNetCDF(metadata.Attributes, reqAttributes);
+    look = meta_look(1).Value;
 end
 
 function lookVal = lookDiscretise(look)
@@ -89,4 +110,16 @@ function Tv_k = rangeVelocityTF(omega,incidenceAngle,k_l,k)
 
 Tv_k = -omega.*(sind(incidenceAngle).*k_l./abs(k) + 1i.*cosd(incidenceAngle));
 
+end
+
+function TR_k = rarMTF(Tt_k,Th_k)
+    TR_k = Tt_k + Th_k;
+end
+
+function Tvb_k = velocityBunchingMTF(beta,k_x,Tv_k)
+    Tvb_k = -1i.*beta.*k_x.*Tv_k;
+end
+
+function TS_k = sarImagingMTF(TR_k,Tvb_k)   
+    TS_k    = TR_k + Tvb_k;
 end

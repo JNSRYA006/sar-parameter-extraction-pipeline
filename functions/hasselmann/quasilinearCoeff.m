@@ -1,16 +1,19 @@
-function [p_s_ql,beta] = quasilinearCoeff(k,k_y,k_x,waveSpectrum,SARmetadata,th)
+function [p_s_ql,beta,xi_sqr] = quasilinearCoeff(k,k_y,k_x,waveSpectrum,SARmetadata,th)
 
 func = helperFunctions;
 
-[beta,look] = getBeta(SARmetadata,245,16,'max');
+[beta] = getBeta(SARmetadata,245,16,'max');
+look = func.getLook(SARmetadata);
 
 look = func.look(look);
+%th = ncread(SARmetadata.Filename,"Incidence_Angle");
 %th = func.incidence(inc_near,inc_far,num_pixels);
 %th = extrapolateIncidence(inc_near,inc_far,num_pixels); % Need to calculate based on velocity and look time
 % Need to check resizing is correct
-k_new = func.resize(k,th(1,:));
-k_y = func.resize(k_y,th(1,:));
-k_x = func.resize(k_x,th(1,:));
+%k_new = func.resize(k,th(1,:));
+k_new = k;
+%k_y = func.resize(k_y,th(1,:));
+%k_x = func.resize(k_x,th(1,:));
 k_l = func.kl(look,k_y);
 omega = func.omega(k_new);
 %% Could be wrong
@@ -18,10 +21,11 @@ omega = func.omega(k_new);
 nanRows = any(isnan(waveSpectrum), 2);
 
 % Remove rows with NaN entries
-waveSpectrum = waveSpectrum(~nanRows, :);
+waveSpectrum = waveSpectrum(2:end,2:end);
 
-waveSpectrum = func.resize(waveSpectrum,zeros(2001,2001));
+waveSpectrum = func.resize(waveSpectrum,th);
 Tv_k = func.rangeVelocityTF(omega,th,k_l,k_new);
+Tv_k = func.resize(Tv_k(:,2:end),waveSpectrum);
 % NEED TO FIGURE OUT HOW TO GET v
 for i=2:length(k)
     dk(i) = k(i)-k(i-1);
@@ -29,15 +33,45 @@ end
 dk = dk(2:end);
 dk = mean(dk);
 
-xi_sqr = beta.^2.*cumtrapz(waveSpectrum.*abs(Tv_k).^2).*dk;
-p_s_ql = exp(-(k_x).^2.*xi_sqr);
+for i=2:length(k_x)
+    dk_x(i) = k_x(i)-k_x(i-1);
+end
+dk_x = dk_x(2:end);
+dk_x = abs(mean(dk_x));
+
+for i=2:length(k_y)
+    dk_y(i) = k_y(i)-k_y(i-1);
+end
+dk_y = dk_y(2:end);
+dk_y = abs(mean(dk_y));
+
+xi_sqr = beta.^2.*cumtrapz(cumtrapz(waveSpectrum.*abs(Tv_k).^2).*dk_x).*dk_y;
+xi_sqr = func.resize(xi_sqr(:,2:end),waveSpectrum);
+xi_sqr = beta.^2.*trapz(trapz(waveSpectrum.*abs(Tv_k).^2).*dk_x).*dk_y;
+xi = sqrt(xi_sqr);
+test_k_neg = -(k_x).^2;
+k_x_cutoff = xi^(-1);
+
+% Cutoff k_x
+% Initialize the index variable
+index = 0;
+% Iterate through the array to find the first index greater than the threshold
+for i = 1:length(k_x)
+    if k_x(i) > k_x_cutoff  
+        index = i;
+        break;  % Exit the loop when the first index is found
+    end
 end
 
-function [beta,look] = getBeta(metadata,orbit_vec_start,num_orbit_vectors,velocity_value_choice)
-    req_atributes = ["slant_range_to_first_pixel","antenna_pointing"];
+p_s_ql = exp(-(k_x).^2*xi_sqr);
+p_s_ql = func.resize(p_s_ql(1:index),waveSpectrum(1,:));
+end
+
+function beta = getBeta(metadata,orbit_vec_start,num_orbit_vectors,velocity_value_choice)
+    req_atributes = ["slant_range_to_first_pixel"];
     meta_beta = filterAttributesNetCDF(metadata.Attributes, req_atributes);
     slant_range = meta_beta(1).Value;
-    look = meta_beta(2).Value;
+    %look = meta_beta(2).Value;
     velocity = getSatVelocity(metadata,num_orbit_vectors,orbit_vec_start,velocity_value_choice);
     beta = slant_range./velocity;
 end

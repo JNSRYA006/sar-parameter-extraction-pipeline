@@ -1,3 +1,17 @@
+%% Testing find closest lat and long
+latitude = 35.15;     % Input latitude
+longitude = -100.7; % Input longitude
+resolution = 0.25;   % Resolution in degrees
+
+[closest_lat, closest_lon] = findClosestLatLon(latitude, longitude, resolution);
+
+fprintf('Closest Latitude: %.2f\n', closest_lat);
+fprintf('Closest Longitude: %.2f\n', closest_lon);
+
+grid_size = 1;       % Size of the grid around the desired coordinates
+
+[grid_lat, grid_lon] = createLatLonGrid(latitude, longitude, resolution);
+
 %% Calculate orbital velocity
 % Time average over period during which scattering element is viewed by SAR
 % Initialize an empty cell array to store the updated attributes
@@ -174,53 +188,32 @@ plot(meta_orb_time,meta_orb_vel_z);
 xlabel('Time')
 ylabel('$z$ velocity (m/s)','interpreter','latex')
 
-%% Calculate Oribital Velocity Covariance
-% Set file location of H5 file
-fileLoc = 'D:\UCT\EEE4022S\Data\CPT\subset_2_cpt.h5';
-testOut = getMetadataH5(fileLoc, 'abstracted');
-testOutAtr = testOut.Attributes;
+%% Fucntions
+function [closest_lat, closest_lon] = findClosestLatLon(latitude, longitude, resolution)
+    % Define the latitude and longitude grid based on the given resolution
+    lat_grid = -90:resolution:90;
+    lon_grid = -180:resolution:180;
 
-req_atributes = ["antenna_pointing","incidence_near","incidence_far"];
-test_output = filterAttributesH5(testOutAtr,req_atributes);
-test_meta_val = getAttributeValH5(test_output,req_atributes);
-%%
-look_index = strcmp({test_meta_val.Name},'antenna_pointing');
-test_meta_val(1).Value;
-look = lookDiscretise(test_meta_val(1).Value);
-incidence_near_index = strcmp({test_meta_val.Name},'incidence_near');
-incidence_near = test_meta_val(incidence_near_index).Value;
-incidence_far_index = strcmp({test_meta_val.Name},'incidence_far');
-incidence_far = test_meta_val(incidence_far_index).Value;
-th = extrapolateIncidence(incidence_near,incidence_far,100);
+    % Find the closest latitude value
+    [~, lat_index] = min(abs(lat_grid - latitude));
+    closest_lat = lat_grid(lat_index);
 
-F_k = 0;
-fv_k = orbitalVelocityCovariance(F_k,th,look,heading);
-
-function lookVal = lookDiscretise(look)
-% Returns 0 for right look, 1 for left look
-
-switch look
-
-    case 'right'
-        lookVal = 0;
-    case 'left'
-        lookVal = 1;
-    otherwise
-        error('Invalid input: "%s"', look);
-end
+    % Find the closest longitude value
+    [~, lon_index] = min(abs(lon_grid - longitude));
+    closest_lon = lon_grid(lon_index);
 end
 
-function incidence = extrapolateIncidence(incidence_near, incidence_far, num_pixels)
-% Creates a linscape array of the incidence angle as it changes through the
-% vertical number of pixels
-if (ischar(incidence_near))
-    incidence_near = str2double(incidence_near);
-end
+function [lat_range, lon_range] = createLatLonGrid(latitude, longitude, resolution)
+    % Define the latitude and longitude grid based on the given resolution
+    lat_grid = -90:resolution:90;
+    lon_grid = -180:resolution:180;
+    grid_size = 1;
 
-if (ischar(incidence_far))
-    incidence_far = str2double(incidence_far);
-end
-
-incidence = linspace(incidence_near,incidence_far,num_pixels);
-
+    % Find the closest latitude and longitude values
+    [~, lat_index] = min(abs(lat_grid - latitude));
+    [~, lon_index] = min(abs(lon_grid - longitude));
+    
+    % Create arrays of latitude and longitude coordinates around the desired coordinates
+    lat_range = lat_grid(lat_index-grid_size:lat_index+grid_size);
+    lon_range = lon_grid(lon_index-grid_size:lon_index+grid_size);
 end

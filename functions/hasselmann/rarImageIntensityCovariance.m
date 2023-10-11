@@ -1,4 +1,4 @@
-function [f_rv_r] = rarImageIntensityCovariance(k,k_y,waveSpectrum,SARmetadata,th,r)
+function [f_rv_r] = rarImageIntensityCovariance(k,k_y,waveSpectrum,SARmetadata,r,th)
     
 % Need:
 % - F(k)
@@ -24,18 +24,21 @@ function [f_rv_r] = rarImageIntensityCovariance(k,k_y,waveSpectrum,SARmetadata,t
 % x-axis = SAR flight direction (azimuthal) (heading)
 
 %% Get required metadata
-[look,inc_near,inc_far,num_pixels,polarisation] = getMetadata_f_rv_r(SARmetadata);
-
+%[look,inc_near,inc_far,num_pixels,polarisation] = getMetadata_f_rv_r(SARmetadata);
 func = helperFunctions;
 
-look = func.look(look);
+look = func.getLook(SARmetadata);
+polarisation = func.getPolarisation(SARmetadata);
 
+look = func.look(look);
+%th = ncread(SARmetadata.Filename,"Incidence_Angle");
 %th = func.incidence(inc_near,inc_far,num_pixels);
 %th = extrapolateIncidence(inc_near,inc_far,num_pixels); % Need to calculate based on velocity and look time
 
 % Need to check resizing is correct
-k_new = func.resize(k,th(1,:));
-k_y = func.resize(k_y,th(1,:));
+%k_new = func.resize(k,th(1,:));
+k_new = k;
+%k_y = func.resize(k_y,th(1,:));
 k_l = func.kl(look,k_y);
 omega = func.omega(k_new);
 %% Could be wrong
@@ -43,20 +46,24 @@ omega = func.omega(k_new);
 nanRows = any(isnan(waveSpectrum), 2);
 
 % Remove rows with NaN entries
-waveSpectrum = waveSpectrum(~nanRows, :);
+waveSpectrum = waveSpectrum(2:end,2:end);
 
-waveSpectrum = func.resize(waveSpectrum,zeros(2001,2001));
-mu = 0;
+waveSpectrum = func.resize(waveSpectrum,th);
+mu = 0.5;
 
 Tt_k = func.tiltMTF(polarisation,k_l,th);
 Th_k = func.hydroMTF(omega,mu,k_new,k_y);
+Th_k = func.resize(Th_k(2:end),waveSpectrum(1,:));
 Tt_k_inv = func.tiltMTF(polarisation,k_l,th);
 Th_k_inv = func.hydroMTF(omega,mu,-k_new,k_y);
-Tr_k = Tt_k + Th_k;
-Tr_k_inv = Tt_k_inv + Th_k_inv;
+Th_k_inv = func.resize(Th_k_inv(2:end),waveSpectrum(1,:));
+Tr_k = func.rarMTF(Tt_k,Th_k);
+Tr_k_inv = func.rarMTF(Tt_k_inv,Th_k_inv);
 
 Tv_k = func.rangeVelocityTF(omega,th,k_l,k_new);
+Tv_k = func.resize(Tv_k(:,2:end),waveSpectrum);
 Tv_k_inv = func.rangeVelocityTF(omega,th,k_l,-k_new);
+Tv_k_inv = func.resize(Tv_k_inv(:,2:end),waveSpectrum);
 
 for i=2:length(k)
     dk(i) = k(i)-k(i-1);

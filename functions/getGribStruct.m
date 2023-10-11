@@ -36,9 +36,9 @@ for i = 1:length(str)
     S(i).latitude = lat;
     S(i).longitude = lon;
     S(i).time = datevec;
-    S(i).significantWaveHeight = ncread(output_file,'WVHGT_surface');
-    S(i).significantWavePeriod = ncread(output_file,'WVPER_surface');
-    S(i).direction = ncread(output_file,'WVDIR_surface');
+    S(i).significantWaveHeight = ncread(output_file,'HTSGW_surface');
+    S(i).significantWavePeriod = ncread(output_file,'PERPW_surface');
+    S(i).direction = ncread(output_file,'DIRPW_surface');
     S(i).windSpeed = ncread(output_file,'WIND_surface');
     S(i).windDirection = ncread(output_file,'WDIR_surface');
     delete(output_file)

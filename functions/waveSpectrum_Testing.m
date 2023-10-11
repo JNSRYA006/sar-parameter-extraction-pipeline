@@ -1,7 +1,7 @@
 %clear
 clc;
 
-filePath = downloadNOAAWaveFile('https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gdas.20230923/12/wave/gridded/gdaswave.t12z.gsouth.0p25.f000.grib2','wave_data.grib2');
+filePath = downloadNOAAWaveFile('https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gdas.20231002/12/wave/gridded/gdaswave.t12z.gsouth.0p25.f000.grib2','wave_data.grib2');
 %% Real Deal
 % NOAA SOUTH IS NOT DOWNLOADING SOUTH - USE DOWNLOAD IN repo NOT functions
 % Can only have 1 .grib2 file in path
@@ -20,73 +20,56 @@ waveVals = getSubsetWaveVals(outStruct,-34,17.25,-34,17.75);
 % k_x = k.*cos(testWaveDirection(1,1));
 % k_y = k.*sin(testWaveDirection(1,1));
 
-%% Plot
-
-noaaDataPlot('miller',outStruct,'windSpeed')
-%%
-figure(1)
-
-m_proj('miller','lat',[min(lat(:)) max(lat(:))],...
-'lon',[min(lon(:)) max(lon(:))])
-
-% Next, plot the field using the M_MAP version of pcolor.
-
-m_pcolor(lon,lat,waveHeight.');
-shading flat;
-
-% Add a coastline and axis values.
-
-m_coast('patch',[.7 .7 .7])
-m_grid('box','fancy')
-
-
-
-% Add a colorbar and title.
-
-colorbar
-title('WAVEWATCH III Wave Height from NOAA (NCEP)');
+%% Plot Wave Data on world map
+noaaDataPlot('miller',outStruct,'significantWavePeriod')
 %% 3D plot
 % Instantiate variables
-w = (0:0.025:2*pi)';
-f = linspace(0,1,252)';
-Hs = testWaveHeight(1,1);
-T0 = testWavePeriod(1,1);
+image_size = size(VV_nc,1);
+%w = (0:0.025:2*pi)';
+w = linspace(0,2*pi,image_size)';
+f = linspace(0,1,image_size)';
+Hs = waveVals.significantWaveHeight(1,1);
+T0 = waveVals.significantWavePeriod(1,1);
 w0 = 2*pi./T0;
 f0 = 1./T0;
 %% Calculate S(\omega)
 %gamma_val = 1.308.*ones(size(Hs));
 gamma_val = 1.308;
-sigma = 0.07; % or 0.09
-nonLin = exp(3.3-0.03.*(gamma_val-1)./sigma)
-S = wavespec(7,[Hs,w0,gamma_val],w,0);
+S = generateSingleJONSWAP(Hs,w0,gamma_val,w);
+% gamma_val = 1.308;
+% sigma = 0.07; % or 0.09
+% nonLin = exp(3.3-0.03.*(gamma_val-1)./sigma)
+%S = wavespec(7,[Hs,w0,gamma_val],w,0);
+figure;
+plot(w,S);
+%plot(f,S);
+%title(['One-dimensional wave spectrum, E(\omega) at ', num2str(waveVals.latitude(1,1)), 'S, ', num2str(waveVals.longitude(1,1)), 'E'])
+legend('JONSWAP for \gamma = 1.308','Location','Northeast')
+xlabel('\omega [rad/s]')
+ylabel('E(\omega) [m^2/rad/Hz]')
+grid on;
+% set(gca,'XTick',0:0.25:1) 
+% set(gca,'XTickLabel',{'0','0.25','0.5','0.75','1'})
+set(gca,'XTick',0:pi/2:2*pi) 
+set(gca,'XTickLabel',{'0','\pi/2','\pi','3\pi/2','2\pi'})
+set(gca,'FontSize',12)
+legend('show')
+%matlab2tikz('../plots/oneDWaveSpec.tex');
 %% Calcuate S(\omega) for multiple lats and longs
-w = (0:0.025:2*pi)';
-Hs = testWaveHeight;
-T0 = testWavePeriod;
-w0 = 2*pi./T0;
-f0 = 1./T0;
-gamma_val = 1.308;
-count = 1;
-for i = 1:length(testLat)
-    for j = 1:length(testLon)
-        Hs = testWaveHeight(j,i);
-        T0 = testWavePeriod(j,i);
-        w0 = 2*pi./T0;
-        f0 = 1./T0;
-        S(:,:,count) = wavespec(7,[Hs,w0,gamma_val],w,0);
-        count = count + 1;
-    end
-end
+S = generateMultipleJONSWAP(waveVals,gamma_val,w,1);
+
+
 %% 2D plot of S(\omega)
-figure(2);
+figure;
 %plot(w,S/(T0*Hs^2))
 %title('S(\omega)/(H_s^2 T_0)')
+
 hold on;
-m = length(testLon);
-for i = 1:count-1
+m = length(waveVals.longitude);
+for i = 1:3
     lat_index = ceil(i/m);
     lon_index = mod(i-1,m)+1;
-    display_name = [num2str(testLat(lat_index)), 'S, ' num2str(testLon(lon_index)), 'E'];
+    display_name = [num2str(waveVals.latitude(lat_index)), 'S, ' num2str(waveVals.longitude(lon_index)), 'E'];
     plot(w,S(:,i),'DisplayName',display_name);
     %legend(["Wave spectrum at: ", num2str(testLat(lat_index)), ", " num2str(testLon(lon_index))]);
     %fprintf('Iteration %d: Latitude %.2f, Longitude %.2f\n', i, testLat(lat_index), testLon(lon_index));
@@ -96,10 +79,11 @@ hold off
 %figure;
 %plot(w,S(:,1));
 %plot(f,S);
-title('S(\omega)')
+%title('E(\omega)')
 %legend('show');
 %legend('JONSWAP for \gamma = 1.308','Location','Northeast')
-xlabel('\omega (rad/s)')
+xlabel('\omega [rad/s]')
+ylabel('E(\omega) [m^2/rad/Hz]')
 grid on;
 % set(gca,'XTick',0:0.25:1) 
 % set(gca,'XTickLabel',{'0','0.25','0.5','0.75','1'})
@@ -114,17 +98,29 @@ nLinOrder = (log(10).*(2*pi.*f_m)^4)./gamma_val.^2
 
 
 %% Directional spreading function, D(\omega)
-Tsig = testWavePeriod(1,1);
+%update to take in desired lat and long coords
+[D,theta] = generateDirectionalDistribution(waveVals,w,1);
+E = generate2DWaveSpectrum(S,D);
+%%
+Tsig = waveVals.significantWavePeriod(1,1);
 Tp = Tsig./0.95;
-sig_th = 26.9.*((1./Tsig)/(1./Tp)).^(-1.05); % in degrees
+wsig = 2*pi./Tsig;
+wp = 2*pi./Tp;
+sig_th = 26.9.*((wsig)/(wp)).^(-1.05); % in degrees
+for i=1:length(w)
+    sig_th(i) = 26.9.*((wsig)/(wp)).^(-1.05); % in degrees
+    if (w(i)>=wp)
+        sig_th(i) = 26.9.*((wsig)/(wp)).^(0.68);
+    end
+end
 %sig_th = 30;
 s = 2./(deg2rad(sig_th).^2) - 1;
 %s = 84;
-Tp = testWavePeriod(1,1)./0.95;
-m = 0.0585.*Tp.^2 - 0.3988.*Tp + 3.0546;
+Tp = waveVals.significantWavePeriod(1,1)./0.95;
+%m = 0.0585.*Tp.^2 - 0.3988.*Tp + 3.0546;
 %theta = (-pi:0.025:pi)'; % Old definition of theta
-th_wave = testWaveDirection(1,1);
-th_wind = testWindDirection(1,1);
+th_wave = waveVals.direction(1,1);
+th_wind = waveVals.windDirection(1,1);
 
 low = th_wave - pi;
 high = th_wave + pi;
@@ -134,10 +130,22 @@ theta = linspace(L,H,252)';
 
 %A1 = gamma(0.5*m+1)./(gamma(0.5*m+1/2).*sqrt(pi));
 %D = A1.*cos(theta).^m;
-A2 = gamma(s+1)./(gamma(s+1/2).*2.*sqrt(pi));
-D = abs(A2 .* cos(0.5.*(th_wave-theta)).^(2*s)); % abs because D is complex. 
+i = 1;
+j = 1;
+while (i<=252)
+    A2 = gamma(s(i)+1)./(gamma(s(i)+1/2).*2.*sqrt(pi));
+    D(:,j) = abs(A2 .* cos(0.5.*(th_wave-theta)).^(2*s(i))); % abs because D is complex. 
+    %t = ones(size(S)); 
+    E(:,:,:,j) = S .* D(:,j)';
+    i = i + 251;
+    j = j + 1;
+end
+
+%A2 = gamma(s+1)./(gamma(s+1/2).*2.*sqrt(pi));
+%D = abs(A2 .* cos(0.5.*(th_wave-theta)).^(2*s)); % abs because D is complex. 
 %t = ones(size(S)); 
-E = S .* D';
+%E = S .* D';
+%%
 % Replace values close to zero with NaN (e.g., values smaller than a threshold)
 threshold = 1e-4;  % Adjust the threshold as needed
 
@@ -151,51 +159,72 @@ E_cleaned(abs(E_cleaned) < threshold) = NaN;
 
 
 
-figure(3);
-plot(theta,D);
-title(['D(\theta) for s = ', num2str(s)]);
-xlabel('\theta (rad)');
-ylabel('D(\theta) (1/rad)')
+figure;
+i = 1;
+j = 1;
+hold on;
+for j=1:2
+    display_name = ['s = ', num2str(s(i))];
+    plot(theta,D(:,j),'DisplayName',display_name);
+    i = i + 511;
+    j+1;
+end
+%plot(theta,D);
+%title('Directional Distribution Function');
+%title(['D(\theta) for s = ', num2str(s)]);
+xlabel('\theta [rad]');
+ylabel('D(\theta) [1/rad]')
 grid on;
 set(gca,'defaultAxesTickLabelInterpreter','latex'); 
 set(gca,'XTick',L:pi/2:H) 
 set(gca,'XTickLabel',{'','\theta_{wave}-\pi/2','\theta_{wave}','\theta_{wave}+\pi/2',''})
 set(gca,'FontSize',12)
+legend('show')
 %matlab2tikz('../plots/directionalSpreading.tex');
 %% Contour of 2D wave spectrum
-E = E(:,:,2);
-figure(4);
+%E = E(:,:,2,2);
+figure;
 contour(x,y,E)
+yline(0);
+xline(0);
 grid on;
-xlabel('\omega (rad/s)'), ylabel('\omega (rad/s)');
-%set(gca,'XTick',-pi/2:pi/6:pi/2) 
-%set(gca,'XTickLabel',{'-\pi/2','-\pi/3','-\pi/6','0','\pi/6', '\pi/3', '\pi/2'})
-%set(gca,'YTick',-pi/2:pi/6:pi/2) 
-%set(gca,'YTickLabel',{'-\pi/2','-\pi/3','-\pi/6','0','\pi/6', '\pi/3', '\pi/2'})
+xlabel('\omega [rad/s]'), ylabel('\omega [rad/s]');
+set(gca,'XTick',-2*pi:pi/2:2*pi) 
+set(gca,'XTickLabel',{'-2\pi','-3\pi/2','-\pi','-\pi/2','0','\pi/2','\pi', '3\pi/2', '2\pi'})
+set(gca,'YTick',-2*pi:pi/2:2*pi) 
+set(gca,'YTickLabel',{'-2\pi','-3\pi/2','-\pi','-\pi/2','0','\pi/2','\pi', '3\pi/2', '2\pi'})
 set(gca,'FontSize',12)
 %matlab2tikz('../plots/contour_E_omega.tex');
-% 3D Spectrum
+%% 3D Spectrum
 figure;
 h=surf(x,y,E);
 grid on;
-xlabel('\omega (rad/s)'), ylabel('\omega (rad/s)'),zlabel('E(\omega,\theta)');
+xlabel('\omega [rad/s]'), ylabel('\omega [rad/s]');
+set(gca,'XTick',-2*pi:pi/2:2*pi) 
+set(gca,'XTickLabel',{'-2\pi','-3\pi/2','-\pi','-\pi/2','0','\pi/2','\pi', '3\pi/2', '2\pi'})
+set(gca,'YTick',-2*pi:pi/2:2*pi) 
+set(gca,'YTickLabel',{'-2\pi','-3\pi/2','-\pi','-\pi/2','0','\pi/2','\pi', '3\pi/2', '2\pi'})
+set(gca,'FontSize',22)
 set(h,'LineStyle','none');
-%set(gca,'XTick',-pi/2:pi/6:pi/2) 
-%set(gca,'XTickLabel',{'-\pi/2','-\pi/3','-\pi/6','0','\pi/6', '\pi/3', '\pi/2'})
-%set(gca,'YTick',-pi/2:pi/6:pi/2) 
-%set(gca,'YTickLabel',{'-\pi/2','-\pi/3','-\pi/6','0','\pi/6', '\pi/3', '\pi/2'})
-colorbar;
-%matlab2tikz('../plots/surf_E_omega.tex');
+c = colorbar;
+%c.Label.String = barStr;
+hL = ylabel(c,'[m^2/rad/Hz]');
+set(hL,'Rotation',0);
 % figure(6);
 % h = surf(w,theta,E_cleaned);
 % set(h,'LineStyle','none');
 % xlabel('\omega (rad/s)')
 % ylabel('\theta (rad)')
-% zlabel('E(\omega,\theta)')
-% colorbar;
+zlabel('E(\omega,\theta)')
+%matlab2tikz('../plots/surf_E_omega.tex');
 
 %% Calculate E(k_x,k_y)
-d = 1; % 70m depth at CP
+d = 70;
+k = (w.^2./g)';
+[E_k,k] = waveNumberSpectrum(E,w,k,d);
+[E_k_inv,k_inv] = waveNumberSpectrum(E,w,-k,d);
+%%
+d = 70; % 70m depth at CP
 %w = sqrt(g.*k.*tanh(k.*d)); % (eq. 5.4.17 in holthuisjen)
 c = sqrt((g./k).*tanh(k.*d)); % tanh in radians (eq. 5.4.23 in holthuisjen) output in m/s^2
 n = 0.5*(1+(2.*k.*d)./sinh(2.*k.*d)); % sinh in radians (eq. 5.4.32 in holthuisjen)
@@ -205,9 +234,12 @@ E_k = ((c.*c_g)./w).*E;
 
 %% k definition of E(k_x,k_y)
 %k = linspace(0,10,252);
-k = (w.^2./g)';
-k_x = k.*cos(testWaveDirection(1,1));
-k_y = k.*sin(testWaveDirection(1,1));
+%k = (w.^2./g)';
+k_x = k.*cos(waveVals.direction(1,1));
+k_y = k.*sin(waveVals.direction(1,1));
+
+k_x_inv = k_inv.*cos(waveVals.direction(1,1));
+k_y_inv = k_inv.*sin(waveVals.direction(1,1));
 
 %% Validation of n
 nValidation(k,70,5);
@@ -216,25 +248,32 @@ nValidation(k,70,5);
 
 % Contour of 2D wave spectrum
 %E = E(:,:,2);
-figure(6);
+figure;
 contour(k_x,k_y,E_k)
 grid on;
+yline(0);
+xline(0);
 xlabel('$k_{x}$','interpreter','latex'), ylabel('$k_{y}$','interpreter','latex');
+%matlab2tikz('../plots/co
 %set(gca,'XTick',-pi/2:pi/6:pi/2) 
 %set(gca,'XTickLabel',{'-\pi/2','-\pi/3','-\pi/6','0','\pi/6', '\pi/3', '\pi/2'})
 %set(gca,'YTick',-pi/2:pi/6:pi/2) 
 %set(gca,'YTickLabel',{'-\pi/2','-\pi/3','-\pi/6','0','\pi/6', '\pi/3', '\pi/2'})
 set(gca,'FontSize',12)
 %matlab2tikz('../plots/contour_E_k.tex');
-% 3D Spectrum
+%% 3D Spectrum
 figure;
-h=surf(k_x,k_y,E);
+h=surf(k_x,k_y,E_k);
 grid on;
 xlabel('$k_{x}$','interpreter','latex'), ylabel('$k_{y}$','interpreter','latex'),zlabel('$E(k_{x},k_{y})$','interpreter','latex');
 set(h,'LineStyle','none');
+c = colorbar;
+%c.Label.String = barStr;
+hL = ylabel(c,'[m^2/rad/Hz]');
+set(hL,'Rotation',0);
+set(gca,'FontSize',22)
 %set(gca,'XTick',-pi/2:pi/6:pi/2) 
 %set(gca,'XTickLabel',{'-\pi/2','-\pi/3','-\pi/6','0','\pi/6', '\pi/3', '\pi/2'})
 %set(gca,'YTick',-pi/2:pi/6:pi/2) 
 %set(gca,'YTickLabel',{'-\pi/2','-\pi/3','-\pi/6','0','\pi/6', '\pi/3', '\pi/2'})
-colorbar;
 %matlab2tikz('../plots/surf_E_k.tex');

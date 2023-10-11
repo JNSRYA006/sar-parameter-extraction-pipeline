@@ -1,12 +1,12 @@
 %% nc import data test
 % Number of Transects
-n = 8;
+n = 3;
 
 % Test getting values
-ncImport = ncinfo('D:\UCT\EEE4022S\Data\CPT\larger_subset.nc');
-VV_nc = ncread('D:\UCT\EEE4022S\Data\CPT\larger_subset.nc','Sigma0_VV');
-[transectData_nc, startPos_nc] = get512Transects(VV_nc,1,1,20,n);
-[transectData2, startPos2] = get512Transects(data_VV_larger,1,1,45,n);
+ncImport = ncinfo('D:\UCT\EEE4022S\Data\CPT\small_subset.nc');
+VV_nc = ncread('D:\UCT\EEE4022S\Data\CPT\small_subset.nc','Sigma0_VV');
+[transectData_nc, startPos_nc] = get512Transects(VV_nc,1,1,45,n);
+%[transectData2, startPos2] = get512Transects(data_VV_larger,1,1,45,n);
 
 % Test metadata
 meta_nc = ncinfo('D:\UCT\EEE4022S\Data\CPT\larger_subset.nc','metadata');
