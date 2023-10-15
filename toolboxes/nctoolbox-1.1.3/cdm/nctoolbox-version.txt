@@ -1,0 +1,4 @@
+GIT COMMIT:   8baf39b
+GIT BRANCH:   master
+GIT DATE:     2016-01-29
+GIT DESCRIBE: 1.1.2

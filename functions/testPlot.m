@@ -1,64 +1,195 @@
-data1 = 'D:\UCT\EEE4022S\Data\CPT\subset_1_cpt\Sigma0_VH.hdr';
-data2 = 'D:\UCT\EEE4022S\Data\CPT\subset_1_cpt\Sigma0_VV.hdr';
-str1 = readEnviHdr(data1);
-str2 = readEnviHdr(data2);
+%% nc import data test
+% Number of Transects
+n = 3;
 
-data_VH = multibandread(str1.file,str1.size,str1.data_type,str1.header_offset,str1.interleave,str1.byte_order);
-data_VH_norm = (data_VH - min(data_VH))./(max(data_VH) - min(data_VH));
-data_VV = multibandread(str2.file,str2.size,str2.data_type,str2.header_offset,str2.interleave,str2.byte_order);
-data_VV_norm = (data_VV - min(data_VV))./(max(data_VV) - min(data_VV));
-fft_data_VH = fft(data_VH);
-fft_data_VV = fft(data_VV);
-%% Plots 
+% Test getting values
+ncImport = ncinfo('D:\UCT\EEE4022S\Data\CPT\small_subset.nc');
+VV_nc = ncread('D:\UCT\EEE4022S\Data\CPT\small_subset.nc','Sigma0_VV');
+[transectData_nc, startPos_nc] = get512Transects(VV_nc,1,1,45,n);
+%[transectData2, startPos2] = get512Transects(data_VV_larger,1,1,45,n);
+
+% Test metadata
+meta_nc = ncinfo('D:\UCT\EEE4022S\Data\CPT\larger_subset.nc','metadata');
+req_atributes = ["MISSION","orbit_cycle","first_line_time","antenna_pointing","PASS","centre_heading","slant_range_to_first_pixel","centre_lat","centre_lon","total_size"];
+%req_atributes = ["MISSION","SWATH", "BEAMS", "ABS_ORBIT"];
+meta_nc = filterAttributesNetCDF(meta_nc.Attributes, req_atributes);
+
 figure(1)
-subplot(1,2,1)
-imagesc(angle(fft_data_VH))
-title('VH Subset')
-subplot(1,2,2)
-imagesc(angle(fft_data_VV))
-title('VV Subset')
-%%
+imshow(VV_nc)
+hold on;
+
+for i = 1:n
+    annotate512Transect(startPos_nc(i,1),startPos_nc(i,2),i,'w','black',1);
+end
+
+title('VV with transects')
+hold off
+% 
 figure(2)
-subplot(2,2,1)
+subplot(2,3,1)
+imshow(transectData_nc(:,:,1));
+title('VV Transect 1 20 deg')
+subplot(2,3,2)
+imshow(transectData_nc(:,:,2));
+title('VV Transect 2 20 deg')
+subplot(2,3,3)
+imshow(transectData_nc(:,:,3));
+title('VV Transect 3 20 deg')
+subplot(2,3,4)
+imshow(transectData_nc(:,:,4));
+title('VV Transect 4 20 deg')
+subplot(2,3,5)
+imshow(transectData_nc(:,:,5));
+title('VV Transect 5 20 deg')
+subplot(2,3,6)
+imshow(transectData_nc(:,:,6));
+title('VV Transect 6 20 deg')
+
+%% Plot - M-Map (SAR)
+titlestr='Test SAR Plot with m-maps';
+datsize=double([1025 1025]);
+
+tielat=h5read(fname,'/tie_point_grids/latitude');
+tielon=h5read(fname,'/tie_point_grids/longitude');
+stp=[h5readatt(fname,'/tie_point_grids/latitude','sub_sampling_x') ...
+     h5readatt(fname,'/tie_point_grids/latitude','sub_sampling_y') ];
+
+subf = filter2(ones(3,3)/9,data_VV);
+
+% Now generate lat/lon for all pixels by interpolating from
+% the tie points.
+% Ty=[0:size(tielat,2)-1]*stp(2)+1;
+% Tx=[0:size(tielat,1)-1]*stp(1)+1;
+% Iy=istart(2)+[0:size(subimg,2)-1]*strd(2);
+% Ix=istart(1)+[0:size(subimg,1)-1]*strd(1);
+% sublat=interp2(Ty',Tx,tielat,Iy',Ix);
+% sublon=interp2(Ty',Tx,tielon,Iy',Ix);
+
+% Now make the map
+% 
+% m_proj('lambert','lon',[-34-45/60 -34-22/60],'lat',[16+34/60 16+44/60]);
+% m_pcolor(sublon,sublat,data_VV);shading flat;
+% m_grid('box','fancy','tickdir','out');
+% %m_ruler(1.03,[.15 .5],'ticklen',[.01]);
+% clim([0 2]);
+% colormap(gray);
+% title(titlestr)
+
+
+
+%% Plots - M_map
+m_proj('ortho','lat',-34.6305','long',16.6026);
+%m_plot(16.6026,-34.6305,data_VH);
+m_grid('linestyle','-','xticklabels',[],'yticklabels',[],'ytick',[-34:16:80]);
+xlabel('Orthographic Projection','visible','on');
+
+
+%% Plots - MATLAB
+
+% figure(1)
+% % subplot(3,2,1)
+% imshow(data_VV_larger)
+% hold on;
+% 
+% for i = 1:n
+%     annotate512Transect(startPos(i,1),startPos(i,2),i,'w','black',1);
+%     annotate512Transect(startPos2(i,1),startPos2(i,2),i,'r','r',0);
+% end
+% 
+% title('VV with transects')
+% hold off
+
+% subplot(3,2,2)
+% imshow(transectData(:,:,1))
+% title('VH Transect 1')
+% subplot(3,2,3)
+% imshow(transectData(:,:,2))
+% title('VH Transect 2')
+% subplot(3,2,4)
+% imshow(transectData(:,:,3))
+% title('VH Transect 3')
+% subplot(3,2,5)
+% imshow(transectData(:,:,4))
+% title('VH Transect 4')
+% subplot(3,2,6)
+% imshow(transectData2(:,:,5))
+% title('VV Transect 5')
+% subplot(2,2,1)
+% imshow(transectData(:,:,2))
+% title('VV Transect 2')
+% subplot(2,2,2)
+% imshow(transectData(:,:,3))
+% title('VV Transect 3')
+% subplot(2,2,3)
+
+figure(3)
+subplot(1,2,1)
 imshow(data_VH)
-title('VH Subset')
-subplot(2,2,2)
-imshow(data_VH_norm)
-title('VH Subset Normalised')
-subplot(2,2,3)
+title('VH Data')
+subplot(1,2,2)
 imshow(data_VV)
-title('VV Subset')
-subplot(2,2,4)
-imshow(data_VV_norm)
-title('VV Subset Normalised')
+title('VV Data')
 
-
-% figure(3)
+figure(4)
+pcolor(data_VV);
+colorbar;
+shading interp
+lims = clim;
+max(data_VV);
+% figure(1)
 % subplot(1,2,1)
 % imagesc(data_VH)
 % title('VH Subset')
 % subplot(1,2,2)
 % imagesc(data_VV)
 % title('VV Subset')
-% %colormap jet
-% %colorbar
 
-figure(4)
-subplot(1,2,1)
-imagesc(data_VH)
-title('VH Subset')
-subplot(1,2,2)
-imagesc(data_VH_norm)
-title('VH Subset Normalised')
-colormap jet
-colorbar
+% figure(2)
+% subplot(2,2,1)
+% imshow(data_VH)
+% hold on;
+% axis on;
+% text(200,256,'1',FontSize=10,Color='w');
+% rectangle('Position',[1,1,512,512],'EdgeColor', 'w','LineWidth', 1,'LineStyle','-')
+% title('VH Subset')
+% hold off
+% subplot(2,2,2)
+% imshow(data_VH_norm)
+% title('VH Subset Normalised')
+% subplot(2,2,3)
+% imshow(data_VV)
+% title('VV Subset')
+% subplot(2,2,4)
+% imshow(data_VV_norm)
+% title('VV Subset Normalised')
 
-figure(6)
-subplot(1,2,1)
-imagesc(data_VV)
-title('VV Subset')
-subplot(1,2,2)
-imagesc(data_VV_norm)
-title('VV Subset Normalised')
-colormap jet
-colorbar
+
+% figure(3)
+% subplot(1,2,1)
+% imagesc(transectData(:,:,1))
+% title('VH Subset')
+% subplot(1,2,2)
+% imagesc(transectData(:,:,2))
+% title('VV Subset')
+% colormap jet
+% colorbar
+
+% figure(4)
+% subplot(1,2,1)
+% imagesc(data_VH)
+% title('VH Subset')
+% subplot(1,2,2)
+% imagesc(data_VH_norm)
+% title('VH Subset Normalised')
+% colormap jet
+% colorbar
+
+% figure(6)
+% subplot(1,2,1)
+% imagesc(data_VV)
+% title('VV Subset')
+% subplot(1,2,2)
+% imagesc(data_VV_norm)
+% title('VV Subset Normalised')
+% colormap jet
+% colorbar
