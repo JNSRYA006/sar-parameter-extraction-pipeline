@@ -6,3 +6,5 @@
 *.grib2
 # HTML files
 *.html
+# signature
+ryanSignature.png
