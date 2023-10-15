@@ -1,0 +1,388 @@
+%****************************************************
+%	CHAPTER 4 - PIPELINE DESIGN
+%****************************************************
+\chapter{Pipeline Design}
+\label{chap:systemDesign}
+
+This chapter's objective is to detail the core design process of this project, a wave parameter extraction pipeline. The fundamental design which needed to be achieved was the extraction of wave parameters from \acs{sar} data. In order to achieve this, 
+
+% \begin{figure}[H]
+%     \centering
+%     \resizebox{0.9\linewidth}{!}{\input{Figures/PipelineDesign/wholeProject}}
+%     \caption{Block Diagram in tex}
+%     \label{fig:testPlotBlock}
+% \end{figure}
+
+% \begin{figure}[H]
+%    \centering
+%    %\begin{tabular}{@{}c@{\hspace{.2cm}}c@{}}
+%        \includegraphics[page=1,width=.9\linewidth]{Figures/PipelineDesign/overall_project.pdf}
+%    %\end{tabular}
+%  \caption{Test}
+%  \label{fig:Test}
+% \end{figure}
+
+
+This chapter begins by providing an overview of the entire pipeline - part of which falls outside of the scope of this project, however, this context is relevant in terms of giving context to the desired results for this project in the context of the broader goals of this pipeline. Each subsequent section will unpack the four main sub-modules within the pipeline in a respective section. Each of these sections will further break down the sub-module into smaller blocks which make up the sub-module. The use of block diagrams allows the process the be understood in terms of the flow of the pipeline, and block diagrams are used throughout this chapter to break down higher-level processes. The variable and function names utilised in this chapter, match those used in the \textsc{Matlab} pipeline.
+
+\section{Overview} \label{sec:systemDesign.overview}
+
+As detailed in xxx, this project required wave parameter extraction for use in a sea ice parameter extraction pipeline. This entire system design is shown as a block diagram in Figure \ref{fig:systemDesign.wholeProject}. It is evident from Figure \ref{fig:systemDesign.wholeProject}, which parts of the \acs{sar} sea ice parameter are relevant to this project. A more detailed block diagram of the wave parameter extraction process is shown in Figure \ref{fig:systemDesign.scope} and within this pipeline, five main functional blocks were identified and are highlighted by five unique colours. [ADD WAVE SPECTRUM GENERATION PIECES]
+% Will still change
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.95\linewidth]{Figures/PipelineDesign/overall_project.pdf}
+    \caption{Pipeline system design in the context of the entire parameter extraction process. The scope of this project is shown in black text, with parts of the pipeline outside of the scope, shown in grey.}
+    \label{fig:systemDesign.wholeProject}
+\end{figure}
+
+% Word better and slim down - ADD DISCUSSION ON WAVE SPECTRUM GENERATION
+The five functional blocks were identified as \textsc{pre-processing}, \textsc{metadata extraction}, \textsc{\acs{sar} spectrum calculation}, \textsc{wave spectrum generation}, and \textsc{inversion}. The \textsc{pre-processing} block involves the use of the \ac{snap} Toolbox developed by \ac{esa} as well as \textsc{matlab}, developed by MathWorks Inc. The \textsc{pre-processing} block reads in a downloaded \acs{sar} Level-1 \ac{grd} data file and outputs a \textsc{matlab} structure of \lstinline[columns=fixed]{n} equal-sized transects. These equal-sized transects can be input to the \textsc{inversion} block. The output \ac{netcdf} file from \acs{snap} is used to generate views of \acs{sar} data in \textsc{matlab}, as well as storing the metadata for the \textsc{metadata extraction} block. The \ac{netcdf} file is read by the \textsc{metadata extraction} block and outputs the desired metadata values required for the \textsc{\acs{sar} spectrum calculation} block. The \textsc{\acs{sar} spectrum calculation} block reads in a wave spectrum sourced from \ac{ncep} and generates a \acs{sar} spectrum of the provided wave spectrum. This generated \acs{sar} spectrum is input to the \textsc{inversion} block along with the output of the \textsc{metadata extraction} block. The \textsc{inversion} block outputs the wave parameters from the input \acs{sar} data.
+% Will still change
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.95\linewidth]{Figures/PipelineDesign/4022_pipeline.pdf}
+    \caption{Pipeline system design for this project broken down further than the entire pipeline shown in Figure \ref{fig:systemDesign.wholeProject} containing all the required metadata and external models required, along with the part of the process that they are required.}
+    \label{fig:systemDesign.scope}
+\end{figure}
+%====================================================
+% PRE-PROCESSING
+%====================================================
+\section{Pre-processing} \label{sec:systemDesign.preProcessing}
+
+
+\subsection{Overview} \label{subsec:systemDesign.preProcessing.Overview}
+
+The pre-processing block of the pipeline was designed in a hybrid manner, with part of the pre-processing done in the \ac{snap} toolbox developed by \ac{esa} prior to the use of \textsc{matlab} tools. The pre-processing block was designed to have an overall function of reading in \ac{s1a} data, apply the desired pre-processing techniques to the \acs{sar} data, and take 512x512 pixel sized transects of this larger \acs{sar} data. The applied pre-processing techniques to calibrate \acs{sar} data for wave parameter extraction were on the recommendation of Giacomo De Carolis and Francesca De Santi of the \acs{irea}, however, discussion around the use of different processing techniques is presented in Chapter \ref{chap:discussion}. The design of this block was designed to keep pre-processing outside of the \textsc{matlab} environment to a minimum, through the use of external tools. 
+
+The pre-processing block had six notable stages: Thermal noise calibration of \acs{s1a} \acs{grd} data, radiometric calibration of these data, extraction of individual pixel incidence angle, exporting calibrated \acs{grd} data to a usable format for \textsc{matlab}, reading in the exported data, and taking 512x512 pixel transects of the larger \acs{sar} data. The flow of this block of the pipeline is shown graphically in Figure \ref{fig:systemDesign.preProcessing.blockDiagram}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.95\linewidth]{Figures/PipelineDesign/pre_processing.pdf}
+    \caption{Block diagram depicting an expanded pre-processing sub-block of Figure \ref{fig:systemDesign.scope}}
+    \label{fig:systemDesign.preProcessing.blockDiagram}
+\end{figure}
+
+\subsection{Thermal Noise Calibration} \label{subsec:systemDesign.preProcessing.thermalNoise}
+
+After obtaining \acs{grd} \acs{sar} data from \href{scihub.copernicus.eu/dhus/#/home}{Copernicus SciHub}, the first sub-block of the pre-processing block was Thermal Noise Calibration
+
+\subsection{Radiometric Calibration} \label{subsec:systemDesign.preProcessing.radiometric}
+
+\subsection{Incidence Angle Extraction} \label{subsec:systemDesign.preProcessing.incidenceAngle}
+
+\subsection{\acs{netcdf} Export} \label{subsec:systemDesign.preProcessing.exportNetCDF}
+% Discuss why netcdf
+\subsection{MATLAB Data Import} \label{subsec:systemDesign.preProcessing.importData}
+
+The first sub-block in the \textsc{matlab} implementation of the pre-processing block was called \lstinline{ncread}. As discussed above, the \acs{netcdf} file format was used for all imported data into \textsc{matlab} due to its use in xxxx.
+
+\subsection{Take Transects and Subdivide Data} \label{subsec:systemDesign.preProcessing.transects}
+
+The most important part of the pre-processing for wave parameter extraction for use in sea ice parameter extraction is the ability to 'follow' the flow of ocean waves into the \acs{miz}. To achieve this, transects of a fixed size are taken of open ocean scenes as well as sea ice scenes. This allows the way in which ocean waves propagate through sea ice to be studied, and due to this, sea ice parameters are able to be extracted using the models described in Section \ref{subsec:litReview.sarCharac.seaIceWaveModelling}. As per \cite{Wadhams2004,DeSanti2018} the size of these transects should be 512x512 pixels in size. Taking transects of a larger image in \textsc{matlab} is relatively straightforward, however, these transects need to be able to be taken at an angle to follow the direction of the visible ocean waves. If the ocean wave direction is not followed, this could cause issues in determining the way in which ocean waves are attenuated in the \acs{miz}. Along with this, the transect needs to start at a certain location of the whole scene. Due to the fact that latitude and longitude are not encoded in the \acs{s1a} \ac{grd} data, it was decided that a pixel starting position would be used to determine the starting position.
+
+Due to the way in which \textsc{matlab} indexes arrays, which is counter-intuitive to other programming languages, with the initial index being given a value of \textsc{1}, a check that the start location of the first transect was a valid index in the imported sarData needed to be conducted. This was achieved using a simple \lstinline{if} statement.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.95\linewidth]{Figures/PipelineDesign/transects_w_SAR.pdf}
+    \caption{Transect of full \acs{sar} data geometry.}
+    \label{fig:systemDesign.transects}
+\end{figure}
+
+
+
+Obtain SAR look over region of interest - want VV and HH polarisation data (mainly used VV)
+
+Start by doing pre-processing in SNAP ESA tool
+\begin{enumerate}
+    \item Thermal noise calibration
+    \item Radiometric Calibration using intensity in linear units
+\end{enumerate}
+
+Export pre-processed data as netCDF file and save path
+
+Import path into MATLAB. Will save desired band data as n x m double of intensity/amplitude values. Able to plot full look in MATLAB. [Need to figure out how to get image rotated by 180 deg ccw/cw]
+
+Transects:
+use get512Transects function. Enter data to take transect of, top left x coord, top left y coord, angle of the transects from + x axis, number of transects(n). Outputs a n x 2 matrix of sar data, and corner pixel values.
+
+Can plot full look showing the location of transects in full look using defined colours and number of transects. Can plot individual transects. Transects will be used to see the evolution of wave parameters across a region
+
+Metadata:
+
+All the required metadata can be extracted using the extractMetadata function. Need to provide the ncread(path,'metadata') output. This returns a structure with the metadata name and value. Certain, different values can be extracted using the filterAttributes function
+
+%====================================================
+% WAVE SPECTRUM GENERATION
+%====================================================
+\section{Wave Spectrum Generation} \label{sec:systemDesign.waveSpectrum}
+
+
+
+\subsection{Overview} \label{subsec:systemDesign.waveSpectrum.Overview}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.95\linewidth]{Figures/PipelineDesign/wave_spectrum.pdf}
+    \caption{Block diagram depicting an expanded wave spectrum generation sub-block of Figure \ref{fig:systemDesign.scope}}
+    \label{fig:systemDesign.wavesSpectrum.blockDiagram}
+\end{figure}
+
+\subsection{Wave Data Download} \label{subsec:systemDesign.waveSpectrum.download}
+
+\subsection{GRIB2 to \acs{netcdf} Conversion} \label{subsec:systemDesign.waveSpectrum.toNetCDF}
+
+\subsection{Wave Parameter Extraction} \label{subsec:systemDesign.waveSpectrum.parameters}
+
+
+When examining the latitude and longitude values obtained from \acs{ncep}, it was noted that these data points contained decimal points of order $10^{-6}$. This proved an issue when trying to index the original downloaded wave data to access a subset of these data using the code snippet depicted in Listing \ref{code:latLonExtract.initial}. This code resulted in none of the desired data being found.
+
+\begin{lstlisting}[caption={Initial implementation of \textsc{Matlab} code to extract wave parameters at certain geographical location.},label={code:latLonExtract.initial}]
+lonVal = 45.25;
+lonIndex = find(lon == lonVal);
+\end{lstlisting}
+
+In order to mitigate this, an investigation into the resolution of decimal degrees was conducted in order to match the spatial resolution of wave data to the corresponding \acs{sar} resolution. It was found that 5 decimal places allowed a worst-case resolution of 1.11\,m \cite{decimalDegreesWikipedia}. In the case of \acs{s1a}, such resolution is adequate, due to the satellite's highest spatial resolution of 9x9\,m resolution for \acs{grd} data \cite{sentinel1ProductDef}. Using this information, it was decided to update the code in Listing \ref{code:latLonExtract.initial} to the code seen in Listing \ref{code:latLonExtract.round} to allow accurate indexing of spatial coordinates without loss of spatial resolution.
+
+\begin{lstlisting}[caption={Updated implementation of \textsc{Matlab} code to extract wave parameters at certain geographical location.},label={code:latLonExtract.round}]
+lonVal = 45.25;
+lonIndex = find(round(lon,5) == lonVal);
+\end{lstlisting}
+
+
+%\subsection{Location Definition} \label{subsec:systemDesign.waveSpectrum.defineLoc}
+% Put in 1D wave spectrum Generation
+
+\subsection{One Dimensional Wave Spectrum} \label{subsec:systemDesign.waveSpectrum.1DSpectrum}
+
+Whilst the generation of a one-dimensional wave spectrum is only represented by one sub-block in Figure \ref{fig:systemDesign.wavesSpectrum.blockDiagram}, the generation of this spectrum is vital to forming the foundation of the two-dimensional wave spectrum which is used as a first-guess wave spectrum when minimising the cost function described in Equation \ref{eq:hh.inversion.J}. As discussed in Section \ref{subsec:theory.waves.modelling}, the most widely used wave model is the \acs{jonswap} model, and implementing this spectrum required a careful approach in order to ensure accurate modelling of waves was done using the downloaded wave data detailed in Section \ref{subsec:systemDesign.waveSpectrum.download}.
+
+In order to construct a \acs{jonswap} wave model, $E(\omega)$, the equations detailed in Section \ref{subsec:theory.waves.modelling} were implemented in \textsc{matlab} as outlined in the pseudocode given in Algorithm \ref{alg:jonswap} where $H_{1/3}$ and $w_{peak}$ are wave parameters as detailed in Section \ref{subsec:theory.waves.waveSpectrum} and $\omega$ is the range of frequencies over which to generate the wave spectrum for. as well as defining which geographical coordinate to construct the wave spectrum for. 
+%% Mention how we know what gamma value to use
+
+
+\begin{figure}[H]
+  \vspace{0.5cm}
+  \centering
+  \captionsetup{type=figure}
+  \begin{minipage}{.75\linewidth}
+    \begin{algorithm}[H]
+      \caption{\acs{jonswap} wave spectrum generation\label{alg:jonswap}}
+
+      \DontPrintSemicolon
+      \SetAlgoLined
+      \SetKwInOut{Input}{input}\SetKwInOut{Output}{output}\SetKwInOut{Parameter}{parameter}
+
+      \Input{Wave parameters, $H_{1/3}$, $\omega_{peak}$ \\ Frequency range, $\omega$}
+      \Output{\acs{jonswap} wave spectrum, $E(\omega)$}
+      \Parameter{Peak enhancement factor, $\gamma$} % What is parameter
+
+      \BlankLine
+          \Begin{
+          $g \leftarrow 9.81$\;
+          $\alpha \leftarrow 0.2 \cdot H_{1/3}^{2} \cdot \frac{\omega_{peak}^{4}}{g^{2}}$ \;
+          \If{$\gamma < 1$ or $\gamma > 7$}{
+            % \If{$\gamma \neq 0$}{
+            %     %\textbf{Display} warning message: "Warning: gamma value in wave_spectrum function outside validity range, using DNV formula"\;
+            % }
+            $k \leftarrow \frac{2\pi}{\omega_{0} \cdot \sqrt{H_{s}}}$\;
+           \If{$k \leq 3.6$}{
+                $\gamma \leftarrow 5$\;
+           }
+           \eIf{$k \leq 5$}{
+                $\gamma \leftarrow \exp(5.75 - 1.15 \cdot k)$\;
+           }{
+                $\gamma \leftarrow 1$\;
+           }
+          }
+        \For{$k$ in $1$ to $\text{length}(\omega)$}{
+        \If{$\omega(k) < \omega_{peak}$}{
+        $\sigma \leftarrow 0.07$\;
+    }
+    \Else{
+        $\sigma \leftarrow 0.09$\;
+    }
+    
+    $E1 \leftarrow \alpha \cdot g^2 \cdot (\omega(k)^{-5}) \cdot \exp\left(-\frac{5}{4} \cdot \left ( \frac{\omega_{peak}}{\omega(k)}\right)^4\right)$\;
+    $exponent \leftarrow  \exp\left(- \frac{(\omega(k) - \omega_0)^2}{2 \cdot (\sigma \cdot \omega_0)^2}\right) $ \;
+    $E2 \leftarrow \gamma^{exponent}$\;
+    
+    $E \leftarrow E1 \cdot E2$\;
+}
+        }
+      \vspace{0.5cm}
+    \end{algorithm}
+  \end{minipage}
+\end{figure}
+
+
+Extending Algorithm \ref{alg:jonswap} to allow multiple spectra to be calculated at multiple latitudes and longitudes allowed the validity of the spectrum generation to be validated as plotting multiple wave spectra on the same set of axes allowed the way in which the wave spectra change as they approach the shore to be determined. This analysis is discussed in Section xxx and example plots obtained using the \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/waveSpectra/generateSingleJONSWAP.m}{\lstinline{generateSingleJONSWAP}} and \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/waveSpectra/generateMultipleJONSWAP.m}{\lstinline{generateMultipleJONSWAP}} functions are shown in Figure \ref{fig:systemDesign.1DSampleWaveSpectrum}. 
+
+% \begin{figure}[H]
+% \centering
+% \begin{subfigure}{0.48\linewidth} % Use \begin{subfigure} instead of \begin{subfigure}
+%     \resizebox{\linewidth}{!}{\input{Figures/PipelineDesign/oneDWaveSpec}}
+%     \caption{\acs{jonswap} spectrum at -34S, 17.25E}
+%     \label{fig:systemDesign.1DSampleWaveSpectrumSingle}   
+% \end{subfigure}
+% \begin{subfigure}{0.48\linewidth} % Use \begin{subfigure} instead of \begin{subfigure}
+%     \resizebox{\linewidth}{!}{\input{Figures/PipelineDesign/waveSpec_toShore}}
+%     \caption{\acs{jonswap} spectrum at multiple geographical locations}
+%     \label{fig:systemDesign.1DSampleWaveSpectrumMultiple}  
+% \end{subfigure}
+% \caption{One-dimensional \acs{jonswap}, E($\omega$), wave spectra generated using \acs{ncep} wave data}
+% \label{fig:systemDesign.1DSampleWaveSpectrum}
+% \end{figure}
+
+\begin{figure} [H]
+    \centering
+    \subcaptionbox{\acs{jonswap} spectrum at -34S, 17.25E\label{fig:systemDesign.1DSampleWaveSpectrumSingle}}[0.48\linewidth]{
+        \resizebox{\linewidth}{!}{\input{Figures/PipelineDesign/oneDWaveSpec}}
+    }
+    \subcaptionbox{\acs{jonswap} spectrum at multiple geographical locations\label{fig:systemDesign.1DSampleWaveSpectrumMultiple}}[0.48\linewidth]{
+        \resizebox{\linewidth}{!}{\input{Figures/PipelineDesign/waveSpec_toShore}}
+    }
+    \caption{One-dimensional \acs{jonswap} wave spectra, E($\omega$), generated using \acs{ncep} wave data.}
+    \label{fig:systemDesign.1DSampleWaveSpectrum}
+\end{figure}
+
+\subsection{Two Dimensional Wave Spectrum} \label{subsec:systemDesign.waveSpectrum.2DSpectrum}
+
+In order to extend the one-dimensional wave spectrum into a two-dimensional wave spectrum, a directional distribution function needed to be applied to the one-dimensional wave spectrum. This is represented in Figure \ref{fig:systemDesign.wavesSpectrum.blockDiagram} with the \lstinline{generateDirectionalSpread} block which takes in the significant wave height obtained from \acs{ncep} as well as the whole range of directions over which to define the directional spreading function. The calculation of the directional distribution function followed the definition of the $\cos^2(\theta)$ as detailed in Equations \ref{eq:directionalDistributionFunc}, \ref{eq:directionalDistributionFunc.A2}, \ref{eq:directionalDistributionFunc.sigTh} in Section \ref{subsec:theory.waves.modelling}. A plot of the directional distribution function generated using the \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/waveSpectra/generateDirectionalDistribution.m}{\lstinline{generateDirectionalSpread}} function is shown in Figure \ref{fig:systemDesign.direcDistributionFunction}.
+
+
+
+% \begin{figure}[H]
+%   \vspace{0.5cm}
+%   \centering
+%   \captionsetup{type=figure}
+%   \begin{minipage}{.75\linewidth}
+%     \begin{algorithm}[H]
+%       \caption{Generation of a directional distribution function using the $\cos^2 \theta$ model\label{alg:cos2}}
+
+%       \DontPrintSemicolon
+%       \SetAlgoLined
+%       \SetKwInOut{Input}{input}\SetKwInOut{Output}{output}\SetKwInOut{Parameter}{parameter}
+%       \SetKwRepeat{Do}{do}{while}
+
+%       \Input{Wave parameters, $T_{1/3}$, $\omega_{peak}$ \\ Frequency range, $\omega$ \\ Number of pixels, $n$}
+%       \Output{Directional distribution function, $D(\theta)$}
+%       %\Parameter{Peak enhancement factor, $\gamma$} % What is parameter
+
+%       \BlankLine
+%           \Begin{
+%             \For{$i$ in $1$ to $\text{length}(\omega)$}{
+%                 \eIf{$\omega(i) \geq \omega_{peak}$}{
+%                     $\sigma_{\theta} \leftarrow 26.9 \cdot \left( \frac{\omega(i)}{\omega_{peak}}  \right)^{0.68}$\;
+%                 }{
+%                     $\sigma_{\theta} \leftarrow 26.9 \cdot \left( \frac{\omega(i)}{\omega_{peak}}  \right)^{-1.05}$\;
+%                 }
+                    
+%             }
+%             $s \leftarrow \frac{2}{\sigma_{\theta}^2} - 1$\;
+%             $low \leftarrow \theta_{wave} - \pi$\;
+%             $high \leftarrow \theta_{wave} + \pi$\;
+%             $L \leftarrow low + \text{remainder}(\theta_{wave} - low,1/n)$\;
+%             $H \leftarrow high - \text{remainder}(\theta_{wave} + high,1/n)$\;
+%             $\theta \leftarrow \text{transpose}(L:n:H)$\;
+%             \For{$j$ in $1$ to $\text{length}(\theta)$}{
+%                 $A_{2} \leftarrow \frac{\Gamma(s(j)+1)}{\Gamma(s(j)+0.5) \cdot \sqrt{2\pi}} $\;
+%                 $D = \text{abs}\left( A_{2} \cdot \left( 0.5 \cdot (\theta_{wave} - \theta(j) \right)^{2 \cdot s(j)}   \right)$\;
+                    
+%             }            
+
+%         }
+%       \vspace{0.5cm}
+%     \end{algorithm}
+%   \end{minipage}
+% \end{figure}
+
+
+\begin{figure}[H]
+    \centering
+    \resizebox{0.48\linewidth}{!}{\input{Figures/PipelineDesign/directionalSpreading.tex}}
+    \caption{Directional distribution function, $D(\theta)$, defined using the $\cos^2(\theta)$ model detailed in Section \ref{subsec:theory.waves.modelling}.}
+    \label{fig:systemDesign.direcDistributionFunction}
+\end{figure}
+
+% Generate 2D spectrum from 1D eq
+In accordance with Equation xx, the two-dimensional directional wave spectrum can be obtained by multiplying the one-dimensional wave spectrum, $E(\omega)$, with the directional distribution function, $D(\theta)$. This was achieved using the \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/waveSpectra/generate2DWaveSpectrum.m}{\lstinline{generate2DWaveSpectrum}} block, which took in the one-dimensional wave spectrum, and the directional distribution function and simply performed an element-wise multiplication using \textsc{matlab}'s built-in 'dot' multiplication. This resulted in the two-dimensional wave spectrum shown in Figure \ref{fig:systemDesign.2DSampleWaveSpectrum}
+% INCREASE SURF FONT SIZE
+\begin{figure} [H]
+    \centering
+    \subcaptionbox{Contour plot of the two-dimensional wave spectrum, E($\omega,\theta$). \label{fig:systemDesign.2DSampleWaveSpectrumContour}}[0.48\linewidth]{
+        \resizebox{\linewidth}{!}{\input{Figures/PipelineDesign/contour_E_omega}}
+    }
+    \subcaptionbox{Surface plot of the two-dimensional wave spectrum, E($\omega,\theta$).\label{fig:systemDesign.2DSampleWaveSpectrum3D}}[0.62\linewidth]{
+        \resizebox{\linewidth}{!}{\includesvg{Figures/PipelineDesign/surf_E_omega.svg}}
+    }
+    \caption{Two-dimensional \acs{jonswap} wave spectra, E($\omega,\theta$), generated using \acs{ncep} wave data.}
+    \label{fig:systemDesign.2DSampleWaveSpectrum}
+\end{figure}
+
+% \begin{figure}[H]
+%     \centering
+%     \resizebox{0.5\linewidth}{!}{\input{Figures/Testing/surf_E_omega.tex}}
+%     \caption{EOmega in tex}
+%     \label{fig:testPlot4}
+% \end{figure}
+
+
+\subsection{Wave-number Spectrum} \label{subsec:systemDesign.waveSpectrum.waveNumberSpectrum}
+
+Converting the two-dimensional wave spectrum generated in Section \ref{subsec:systemDesign.waveSpectrum.2DSpectrum} to a two-dimensional wave-number spectrum for use in the \ac{hh} procedure, required implementing Equation \ref{eq:waveNumberSpectrum.relateE(kx,ky)toE(w,th)_2D} in \textsc{matlab} code. In order to implement this equation, the wave speed as described in Equation \ref{eq:linearWaveTheory.phaseVelocity} was used to determine the individual wave speed at the known depth of the region of interest. Following on from this, $n$ needed to be determined as per Equation \ref{eq:addingTwoWaves.n} to determine the group wave speed, $c_{g}$ as detailed in Equation \ref{eq:addingTwoWaves.groupVelocity}. After determining all of these variables for the specific wave spectrum, the wave-number spectrum could be determined using the relationship between the two-dimensional wave spectrum and two-dimensional wave-number spectrum as detailed in Equation \ref{eq:waveNumberSpectrum.relateE(kx,ky)toE(w,th)_2D}. To see the change between the wave spectrum, and wave-number spectrum, a contour and surface plot are provided in Figure \ref{fig:systemDesign.2DSampleWaveNumSpectrum} of the equivalent wave spectrum shown in Figure \ref{fig:systemDesign.2DSampleWaveSpectrum}.
+
+\begin{figure} [H]
+    \centering
+    \subcaptionbox{Contour plot of the two-dimensional wave-number spectrum, E($k_{x},k_{y}$). \label{fig:systemDesign.2DSampleWaveNumSpectrumContour}}[0.36\linewidth]{
+        \resizebox{\linewidth}{!}{\input{Figures/PipelineDesign/contour_E_k}}
+    }
+    \subcaptionbox{Surface plot of the two-dimensional wave-number spectrum, E($k_{x},k_{y}$).\label{fig:systemDesign.2DSampleWaveNumSpectrum3D}}[0.62\linewidth]{
+        \resizebox{\linewidth}{!}{\includesvg{Figures/PipelineDesign/surf_E_k.svg}}
+    }
+    \caption{Two-dimensional \acs{jonswap} wave-number spectra, E($k_{x},k_{y}$), generated using \acs{ncep} wave data.}
+    \label{fig:systemDesign.2DSampleWaveNumSpectrum}
+\end{figure}
+
+
+\section{\acs{sar} Spectrum} \label{sec:systemDesign.sarSpectrum}
+
+\subsection{\acf{mtf}s} \label{subsec:systemDesign.sarSpectrum.mtfs}
+
+\subsection{Co and Autocovariance Functions} \label{subsec:systemDesign.sarSpectrum.coAutoFunc}
+
+\subsection{Spectral Expansion} \label{subsec:systemDesign.sarSpectrum.spectralExpan}
+
+
+
+\section{Inversion} \label{sec:systemDesign.inversion}
+
+\subsection{First-estimates} \label{subsec:systemDesign.inversion.firstEstimates}
+
+\subsection{Cost Function Minimisation} \label{subsec:systemDesign.inversion.costFuncMinimise}
+
+
+\subsection{Change in Wave Spectrum} \label{subsec:systemDesign.inversion.changeWaveSpectrum}
+
+
+\subsection{Output Wave Parameters} \label{subsec:systemDesign.inversion.outputWaveParams}
+
+
+
+\textbf{Inversion procedure}
+
+Use the appropriate functions to calculate all the covariance functions. All MTFs need to be calculated individually and then fed in, with metadata values, into the appropriate functions. The output values are stored as a matrix. Compute the covariance functions for the spectral expansions using the appropriate functions. Then compute the FTs of these. The FTs of these can be plotted to observe the contribution to the overall SAR spectrum. 
+
+The overall SAR spectrum is used in the inversion procedure. Obtain wave model using XXXX [update when I know wtf is going on]. The appropriate values are fed into the $\Delta F^n$ function. The cost function is then provided with all the input parameters and iterated through to provide the output wave parameters which are stored in a matrix. This can then be iterated for each transect. The appropriate plots can be generated to see attenuation and changes between wave parameters. These wave parameters are then compared to the appropriate ground truths from the CSIR. These data can be fed into the sea ice attenuation models 
+
+%====================================================
+
+
+%====================================================
+
+
+%****************************************************
+% END
+%****************************************************

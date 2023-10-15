@@ -1,4 +1,4 @@
-function [D,theta] = generateDirectionalDistribution(waveStruct,freqArray,freqChoice)
+function [D,theta,s] = generateDirectionalDistribution(waveStruct,freqArray,freqChoice)
 
 Tsig = waveStruct.significantWavePeriod(1,1);
 Tp = Tsig./0.95;
@@ -14,11 +14,21 @@ end
 %freqP = 2*pi./Tp;
 sig_th = 26.9.*((freqSig)/(freqP)).^(-1.05); % in degrees
 for i=1:length(freqArray)
-    sig_th(i) = 26.9.*((freqSig)/(freqP)).^(-1.05); % in degrees
     if (freqArray(i)>=freqP)
         sig_th(i) = 26.9.*((freqSig)/(freqP)).^(0.68);
+    else
+        sig_th(i) = 26.9.*((freqSig)/(freqP)).^(-1.05); % in degrees
+
     end
 end
+% for i=1:length(freqArray)
+%     if (freqArray(i)>=freqP)
+%         sig_th(i) = 26.9.*((freqArray(i))/(freqP)).^(0.68);
+%     else
+%         sig_th(i) = 26.9.*((freqArray(i))/(freqP)).^(-1.05); % in degrees
+% 
+%     end
+% end
 %sig_th = 30;
 s = 2./(deg2rad(sig_th).^2) - 1;
 %s = 84;

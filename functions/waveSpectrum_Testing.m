@@ -24,7 +24,8 @@ waveVals = getSubsetWaveVals(outStruct,-34,17.25,-34,17.75);
 noaaDataPlot('miller',outStruct,'significantWavePeriod')
 %% 3D plot
 % Instantiate variables
-image_size = size(VV_nc,1);
+image_size = 512;
+%image_size = size(VV_nc,1);
 %w = (0:0.025:2*pi)';
 w = linspace(0,2*pi,image_size)';
 f = linspace(0,1,image_size)';
@@ -271,7 +272,7 @@ c = colorbar;
 %c.Label.String = barStr;
 hL = ylabel(c,'[m^2/rad/Hz]');
 set(hL,'Rotation',0);
-set(gca,'FontSize',22)
+set(gca,'FontSize',32)
 %set(gca,'XTick',-pi/2:pi/6:pi/2) 
 %set(gca,'XTickLabel',{'-\pi/2','-\pi/3','-\pi/6','0','\pi/6', '\pi/3', '\pi/2'})
 %set(gca,'YTick',-pi/2:pi/6:pi/2) 

@@ -229,9 +229,13 @@ intensityFFT = abs(fftshift(fft2(transectData_nc(:,:,3))));
 % Plot the power spectrum
 dk_x = 0.005890997229533;
 dk_y = -0.005226593472072;
+above0intesity = intensityFFT;
+above0intesity(intensityFFT < 1) = 0;
+%%
 figure;
 %contourf(k_x./dk_x,k_y./dk_y,20*log10(intensityFFT))
 contourf(20*log10(intensityFFT))
+%surf(20*log10(intensityFFT),'LineStyle','none')
 colorbar;
 %imagesc(20*log10(intensityFFT))
 %imshow(VV_nc)
