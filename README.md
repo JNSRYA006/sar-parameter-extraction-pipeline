@@ -52,9 +52,19 @@ A description of the various folders and functions contained within this directo
 
 ### Prerequisites
 The following software and MATLAB toolboxes are required to run this pipeline.
-* SNAP ESA
-* M_Map
-* wgrib
+1. #### SNAP ESA
+SNAP is a tool developed by the European Space Agency (ESA) to process SAR data obtained from Sentinel Satellites. SNAP is used to pre-process data in this pipeline and is essential to install.
+To install SNAP please do the following:
+- Download [SNAP here](https://step.esa.int/main/download/snap-download/) for your OS distribution
+- Choose only the Sentinel Toolboxes installer
+- Install SNAP and follow the onscreen instructions. It is only necessary to install the Sentinel-1 Toolbox
+2. #### M_Map
+M_Map is a mapping package for MATLAB which allows data plots on different world maps.
+To use M_Map please do the following:
+- Download the zipped package here and
+- Add the extracted folder to your MATLAB path
+- _Note:_ A copy of the M_Map package is included on this git repo in the following path: [`toolboxes/m_map`](./toolboxes/m_map)
+3. wgrib
   ```sh
   npm install npm@latest -g
   ```
