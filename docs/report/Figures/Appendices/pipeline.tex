@@ -1,0 +1,489 @@
+% This LaTeX was auto-generated from MATLAB code.
+% To make changes, update the MATLAB code and export to LaTeX again.
+
+\sloppy
+\epstopdfsetup{outdir=./}
+\graphicspath{ {./pipeline_images/} }
+
+\matlabhastoc
+
+
+\label{T_B8033DED}
+\matlabtitle{Wave Parameter Extraction Pipeline}
+
+\begin{par}
+\begin{flushleft}
+This MATLAB LiveScript serves as a live document to show the implementation of the SAR wave parameter extraction pipeline with additional documentation. Documentation notes are included before code blocks which explain the code which follows.
+\end{flushleft}
+\end{par}
+
+\matlabtableofcontents{Table of Contents}
+
+\label{H_45278BA7}
+\matlabheading{Prerequisites}
+
+\label{H_603A9976}
+\matlabheadingtwo{Software Prerequisites}
+
+\label{H_FF806E53}
+\matlabheadingthree{SNAP ESA}
+
+\begin{par}
+\begin{flushleft}
+SNAP is a tool developed by the European Space Agency (ESA) to process SAR data obtained from Sentinel Satellites. SNAP is used to pre-process data in this pipeline and is essential to install.
+\end{flushleft}
+\end{par}
+
+\begin{par}
+\begin{flushleft}
+To install SNAP please do the following:
+\end{flushleft}
+\end{par}
+
+\begin{itemize}
+\setlength{\itemsep}{-1ex}
+   \item{\begin{flushleft} Download SNAP \href{https://step.esa.int/main/download/snap-download/}{here} for your OS distribution \end{flushleft}}
+   \item{\begin{flushleft} Choose only the Sentinel Toolboxes installer \end{flushleft}}
+   \item{\begin{flushleft} Install SNAP and follow the onscreen instructions. It is only necessary to install the Sentinel-1 Toolbox \end{flushleft}}
+\end{itemize}
+
+\label{H_69BBBAC5}
+\matlabheadingtwo{MATLAB Prerequisites}
+
+\begin{par}
+\begin{flushleft}
+Python 3.8 (Need to check version in MATLAB)
+\end{flushleft}
+\end{par}
+
+\begin{matlabcode}
+pe = pyenv;
+pyVersion = pe.Version;
+if ~(strcmp(pyVersion, "3.8"))
+    pe(Version="3.8")
+end
+\end{matlabcode}
+
+\begin{par}
+\begin{flushleft}
+CDS Toolbox
+\end{flushleft}
+\end{par}
+
+\label{H_E263194C}
+\matlabheadingthree{M\_Map}
+
+\begin{par}
+\begin{flushleft}
+M\_Map is a mapping package for MATLAB which allows data plots on different world maps.
+\end{flushleft}
+\end{par}
+
+\begin{par}
+\begin{flushleft}
+To use M\_Map please do the following:
+\end{flushleft}
+\end{par}
+
+\begin{itemize}
+\setlength{\itemsep}{-1ex}
+   \item{\begin{flushleft} Download the zipped package \href{https://www.eoas.ubc.ca/~rich/map.html#download}{here} and \end{flushleft}}
+   \item{\begin{flushleft} Add the extracted folder to your MATLAB path \end{flushleft}}
+\end{itemize}
+
+\begin{par}
+\begin{flushleft}
+\textit{Note:} A copy of the M\_Map package is included on this git repo in the following path: 
+\end{flushleft}
+\end{par}
+
+\label{H_ADB0A04B}
+\matlabheadingthree{wgrid}
+
+
+\label{H_7B094A5D}
+\matlabheading{Obtain SAR Data}
+
+\begin{par}
+\begin{flushleft}
+SAR data from Sentinel-1A can be downloaded from \href{https://scihub.copernicus.eu/dhus/#/home}{Copernicus SciHub}. In order to download data, you need to register an account on the site.
+\end{flushleft}
+\end{par}
+
+\begin{par}
+\begin{flushleft}
+Once you have registered your account, you can search for SAR data on the site by choosing the appropriate filters and region. The region you search is set by right-clicking and drawing a rectangle, otherwise you can left-click and draw the vertices of any polygon. Recomended filters are:
+\end{flushleft}
+\end{par}
+
+\begin{enumerate}
+\setlength{\itemsep}{-1ex}
+   \item{\begin{flushleft} \textbf{Sensing Period: }As desired \end{flushleft}}
+   \item{\begin{flushleft} \textbf{Satellite Platform:} S1A \end{flushleft}}
+   \item{\begin{flushleft} \textbf{Product Type:} GRD \end{flushleft}}
+   \item{\begin{flushleft} \textbf{Polarisation:} As desired \end{flushleft}}
+\end{enumerate}
+
+\begin{par}
+\begin{flushleft}
+After searching with your filters, you will see all the available data within this region. Clicking on a red footprint on the map, shows a preview of these data, and the data can be downloaded from the pop-up. 
+\end{flushleft}
+\end{par}
+
+\begin{par}
+\begin{flushleft}
+\textit{Note: }These data are in excess of 1GB, so large amounts of storage space is required. Use an external hard drive if possible.
+\end{flushleft}
+\end{par}
+
+
+\label{H_1D14B3F6}
+\matlabheading{\textbf{Pre-Process SAR Data}}
+
+\begin{par}
+\begin{flushleft}
+After downloading SAR data from \href{https://scihub.copernicus.eu/dhus/#/home}{Copernicus SciHub}, open \hyperref[H_FF806E53]{SNAP} and import the data. These data can be viewed as follows:
+\end{flushleft}
+\end{par}
+
+\begin{enumerate}
+\setlength{\itemsep}{-1ex}
+   \item{\begin{flushleft} Click the '+' next to the dataset \end{flushleft}}
+   \item{\begin{flushleft} Click the '+' next to the \textit{Bands} folder \end{flushleft}}
+   \item{\begin{flushleft} Open the desired band to preview the image \end{flushleft}}
+\end{enumerate}
+
+\label{H_B7EBD40C}
+\matlabheadingtwo{Thermal Noise Calibration}
+
+\begin{par}
+\begin{flushleft}
+\textbf{This needs to be done first}
+\end{flushleft}
+\end{par}
+
+\begin{par}
+\begin{flushleft}
+To remove thermal noise, click \textit{Radar -\textgreater{} Radiometric -\textgreater{} S1 Thermal Noise Removal. }This will bring up a window where the following needs to be done.
+\end{flushleft}
+\end{par}
+
+\begin{enumerate}
+\setlength{\itemsep}{-1ex}
+   \item{\begin{flushleft} Ensure the file will save as \textit{BEAM-DIMAP} \end{flushleft}}
+   \item{\begin{flushleft} Check that \textit{Remove Thermal Noise} is checked in the \textit{Processing Parameters} window \end{flushleft}}
+   \item{\begin{flushleft} Select a specific polarisation (If desired) \end{flushleft}}
+   \item{\begin{flushleft} Rename the output file (\textit{Target Product) }if desired \end{flushleft}}
+   \item{\begin{flushleft} Check the \textit{Open in SNAP} checkbox \end{flushleft}}
+\end{enumerate}
+
+\begin{par}
+\begin{flushleft}
+After clicking \textit{Run,} SNAP will begin removing thermal noise from the selected data and once complete will open in the \textit{Product Explorer }sidebar.
+\end{flushleft}
+\end{par}
+
+\label{H_0477ED49}
+\matlabheadingtwo{Radiometric Calibration}
+
+\begin{par}
+\begin{flushleft}
+To radiometrically calibrate the SAR data, ensure that the \textbf{noise calibrated product is selected}, then click \textit{Radar -\textgreater{} Radiometric -\textgreater{} Calibrate }This will bring up a window where the following needs to be done.
+\end{flushleft}
+\end{par}
+
+\begin{enumerate}
+\setlength{\itemsep}{-1ex}
+   \item{\begin{flushleft} Ensure the file will save as \textit{BEAM-DIMAP} \end{flushleft}}
+   \item{\begin{flushleft} Check that \textbf{only} \textit{Output sigma0 band} is checked in the \textit{Processing Parameters} window \end{flushleft}}
+   \item{\begin{flushleft} Select a specific polarisation (If desired) \end{flushleft}}
+   \item{\begin{flushleft} Rename the output file (\textit{Target Product) }if desired \end{flushleft}}
+   \item{\begin{flushleft} Check the \textit{Open in SNAP} checkbox \end{flushleft}}
+\end{enumerate}
+
+\begin{par}
+\begin{flushleft}
+After clicking \textit{Run,} SNAP will begin radiometric calibration from the selected data and once complete will open in the \textit{Product Explorer }sidebar.
+\end{flushleft}
+\end{par}
+
+\label{H_C1EC94A9}
+\matlabheadingtwo{Export Incidence Angle}
+
+\begin{par}
+\begin{flushleft}
+In order to access the incidence angle of each pixel in the the SAR data, the following process needs to be followed.
+\end{flushleft}
+\end{par}
+
+\begin{enumerate}
+\setlength{\itemsep}{-1ex}
+   \item{\begin{flushleft} Click the '+' next to the \textit{Tie-Point Grids} folder \end{flushleft}}
+   \item{\begin{flushleft} Right-click on the \textit{incident\_angle} band \end{flushleft}}
+   \item{\begin{flushleft} Select \textit{Band Maths} \end{flushleft}}
+   \item{\begin{flushleft} Rename the band to "Incidence\_Angle" and click OK \end{flushleft}}
+\end{enumerate}
+
+\label{H_69B1A933}
+\matlabheadingtwo{Exporting as NetCDF}
+
+\begin{par}
+\begin{flushleft}
+In order to export these pre-processed SAR data in a format supported by MATLAB, the following process needs to be followed.
+\end{flushleft}
+\end{par}
+
+\begin{enumerate}
+\setlength{\itemsep}{-1ex}
+   \item{\begin{flushleft} Click \textit{File} \end{flushleft}}
+   \item{\begin{flushleft} Hover over the \textit{Export} option, and select \textbf{NetCDF4-BEAM} \end{flushleft}}
+   \item{\begin{flushleft} If your file explorer is opened, click on \textit{Subset... }on the right hand side of the dialog box \end{flushleft}}
+   \item{\begin{flushleft} This will bring up a new window with four different menus. \end{flushleft}}
+   \item{\begin{flushleft} You can take a Spatial Subset of the image using either pixel or geographical coordinates in the \textit{Spatial Subset }menu \end{flushleft}}
+   \item{\begin{flushleft} Ensure that under the \textit{Band Subset} menu, your desired bands are selected, as well as your created \textit{\textbf{Incidence\_Angle}}\textbf{ band. } \end{flushleft}}
+   \item{\begin{flushleft} Ensure that under the \textit{Metadata Subset} menu, all options are selected \end{flushleft}}
+   \item{\begin{flushleft} After checking all of these parameters, click OK, and name the file as desired and save it in your desired location \end{flushleft}}
+\end{enumerate}
+
+\begin{par}
+\begin{flushleft}
+Optional
+\end{flushleft}
+\end{par}
+
+
+\vspace{1em}
+
+\label{H_A008662F}
+\matlabheading{Take transects and subdivide}
+
+\begin{par}
+\begin{flushleft}
+After exporting the SAR data as a NetCDF file, use the following commands to import the data and metadata into MATLAB.
+\end{flushleft}
+\end{par}
+
+\begin{matlabcode}
+filepath = "D:\UCT\EEE4022S\Data\CPT\smaller_subset_incidence.nc";
+% Import data values
+ncImport = ncinfo(filepath);
+% Update the band to import as required
+sarData = ncread(filepath,'Sigma0_VV');
+metadata = ncinfo(filepath,'metadata');
+incidenceAngle = ncread(filepath,'Incidence_Angle');
+\end{matlabcode}
+
+
+\label{H_82C18072}
+\matlabheadingtwo{Define Transect Parameters}
+
+\begin{par}
+\begin{flushleft}
+Enter the number of desired transects to take, the start point (in pixels), along with the angle at which to take the transects. This angle is calculated from the positive x-axis clockwise.
+\end{flushleft}
+\end{par}
+
+\begin{matlabcode}
+% Enter the number of transects
+n = 3;
+th = 10;
+[transectData, positions] = get512Transects(sarData,1,1,th,n);
+\end{matlabcode}
+
+\begin{par}
+\begin{flushleft}
+The original data, with shown transects can be plotted as follows.
+\end{flushleft}
+\end{par}
+
+\begin{matlabcode}
+figure(1)
+imshow(sarData)
+hold on;
+
+for i = 1:n
+    annotate512Transect(positions(i,1),positions(i,2),i,'red','black',1);
+end
+
+title('Sentinel-1A data with transects displayed')
+hold off
+\end{matlabcode}
+
+\begin{par}
+\begin{flushleft}
+The individual transects can be plotted as follows.
+\end{flushleft}
+\end{par}
+
+\begin{matlabcode}
+figure(2)
+subplot(1,3,1)
+imshow(transectData(:,:,1));
+title(['Transect 1 at ',num2str(th),' degrees'])
+subplot(1,3,2)
+imshow(transectData(:,:,2));
+title(['Transect 2 at ',num2str(th),' degrees'])
+subplot(1,3,3)
+imshow(transectData(:,:,3));
+title(['Transect 3 at ',num2str(th),' degrees'])
+\end{matlabcode}
+
+\begin{par}
+\begin{flushleft}
+Metadata can be imported using the \texttt{ncinfo} function. This large metadata structure can be slimmed down by filtering using the desired attributes for subsequent functions.
+\end{flushleft}
+\end{par}
+
+\begin{matlabcode}
+% Metadata
+%metadata = ncinfo(filepath,'metadata');
+req_atributes = ["first_near_lat","first_near_long","first_far_lat","first_far_long","last_near_lat","last_near_long","last_far_lat","last_far_long","centre_lat","centre_lon", "num_output_lines","num_samples_per_line"];
+metadata_filtered = filterAttributesNetCDF(metadata.Attributes, req_atributes);
+\end{matlabcode}
+
+
+\label{H_1A16A1DF}
+\matlabheading{Metadata Extraction}
+
+
+\vspace{1em}
+
+\vspace{1em}
+
+\label{H_357F0BDA}
+\matlabheading{Generate Wave Spectra}
+
+\begin{par}
+\begin{flushleft}
+Before generating wave spectra, please source data from \href{https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/}{NOAA NCEP here}. Ensure that you select data in the following manner.
+\end{flushleft}
+\end{par}
+
+\begin{enumerate}
+\setlength{\itemsep}{-1ex}
+   \item{\begin{flushleft} Select data of the following form: \texttt{\textbf{gdas.date}} \end{flushleft}}
+   \item{\begin{flushleft} Select the desired time (Either \texttt{00/}, \texttt{06/}, \texttt{12/}, or \texttt{18/}) \end{flushleft}}
+   \item{\begin{flushleft} Select \texttt{wave/} data \end{flushleft}}
+   \item{\begin{flushleft} Choose the \texttt{gridded/ }data \end{flushleft}}
+   \item{\begin{flushleft} Once completing all of the above, choose any data in the following form: \texttt{gdaswave.}\texttt{\textbf{time}}\texttt{z.}\texttt{\textbf{location}}\texttt{.0p25.f000.grib2, }where the \textbf{bold} values are user decided variables \end{flushleft}}
+   \item{\begin{flushleft} After choosing a data set, right-click and copy the link address \end{flushleft}}
+\end{enumerate}
+
+\begin{par}
+\begin{flushleft}
+Parse in your chosen dataset
+\end{flushleft}
+\end{par}
+
+\begin{matlabcode}
+noaaUrl = "https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gdas.20231002/12/wave/gridded/gdaswave.t12z.gsouth.0p25.f000.grib2";
+\end{matlabcode}
+
+\begin{par}
+\begin{flushleft}
+Set the name for the saved downloaded \texttt{.grib2} file and the file will be downloaded and saved.
+\end{flushleft}
+\end{par}
+
+\begin{matlabcode}
+waveDownloadName = "wave_data.grib2";
+waveFilePath = downloadNOAAWaveFile(noaaUrl,waveDownloadName);
+\end{matlabcode}
+
+\begin{par}
+\begin{flushleft}
+Set the location of wgib and the downloaded \texttt{.grib2} filepath as well as choosing if you'd like to plot your downloaded data along with the type to plot
+\end{flushleft}
+\end{par}
+
+\begin{matlabcode}
+GribPath = "C:\Users\ryanj\OneDrive - University of Cape Town\4. Fourth Year\Second Semester\EEE4022S\repo\sar-parameter-extraction-pipeline\functions\";
+wgrib2Path = "C:\Users\ryanj\Downloads";
+waveStruct = getGribStruct(wgrib2Path,GribPath);
+noaaPlot = true;
+noaaValToPlot = 'direction';
+if noaaPlot
+    noaaDataPlot('miller',waveStruct,noaaValToPlot);
+end
+\end{matlabcode}
+
+\begin{par}
+\begin{flushleft}
+Set the location at which to generate wave spectra for
+\end{flushleft}
+\end{par}
+
+\begin{matlabcode}
+latitude = -34.2;
+longitude = 18.6;
+[gridLat, gridLon] = createLatLonGrid(latitude, longitude, resolution);
+startLat = max(gridLat)
+startLon = min(gridLon)
+endLat = min(gridLat)
+endLon = max(gridLon)
+waveVals = getSubsetWaveVals(waveStruct,startLat,startLon,endLat,endLon);
+\end{matlabcode}
+
+\label{H_D6296C3F}
+\matlabheadingtwo{Generate One-dimensional Wave Spectra}
+
+\begin{par}
+\begin{flushleft}
+Define and instantiate variables for the one-dimensional wave spectra
+\end{flushleft}
+\end{par}
+
+\begin{matlabcode}
+imageSize = size(sarData,1);
+w = linspace(0,2*pi,imageSize)';
+f = linspace(0,1,imageSize)';
+Hs = waveVals.significantWaveHeight(1,1);
+T0 = waveVals.significantWavePeriod(1,1);
+w0 = 2*pi./T0;
+f0 = 1./T0;
+gammaVal = 1.308;
+multipleWaveSpectra = false;
+if multipleWaveSpectra
+    S = generateMultipleJONSWAP(waveVals,gammaVal,w,1);   
+else
+    S = generateSingleJONSWAP(Hs,w0,gammaVal,w);
+end
+\end{matlabcode}
+
+\label{H_D690D0F0}
+\matlabheadingtwo{Generate Two-dimensional Wave Spectra}
+
+\begin{matlabcode}
+[D,theta] = generateDirectionalDistribution(waveVals,w,1);
+E = generate2DWaveSpectrum(S,D);
+\end{matlabcode}
+
+
+\vspace{1em}
+
+\label{H_63792B58}
+\matlabheading{SAR Spectrum Calculation}
+
+
+\vspace{1em}
+
+\label{H_B1CC5E95}
+\matlabheading{Hasselmann Procedure}
+
+
+\vspace{1em}
+
+\vspace{1em}
+\label{H_893CF502}
+\matlabheadingtwo{Generate SAR spectrum of Ocean Waves}
+
+
+\vspace{1em}
+\label{H_F29E6812}
+\matlabheadingtwo{Inversion}
+
+
+\vspace{1em}
+
+\label{H_06FC8CFF}
+\matlabheading{Output Parameters}

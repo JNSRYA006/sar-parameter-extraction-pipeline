@@ -1,7 +1,7 @@
 %clear
 clc;
 
-filePath = downloadNOAAWaveFile('https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gdas.20231002/12/wave/gridded/gdaswave.t12z.gsouth.0p25.f000.grib2','wave_data.grib2');
+filePath = downloadNOAAWaveFile('https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gdas.20231010/12/wave/gridded/gdaswave.t12z.gsouth.0p25.f000.grib2','wave_data.grib2');
 %% Real Deal
 % NOAA SOUTH IS NOT DOWNLOADING SOUTH - USE DOWNLOAD IN repo NOT functions
 % Can only have 1 .grib2 file in path
@@ -11,8 +11,13 @@ outStruct = getGribStruct("C:\Users\ryanj\Downloads","C:\Users\ryanj\OneDrive - 
 % Define constants
 g = 9.81;
 
+latStart = grid_lat(1,3)
+latEnd = grid_lat(1,3)
+lonStart = grid_lon(1,1)
+lonEnd = grid_lon(1,2)
+%%
 % Get range of values in lat and long
-waveVals = getSubsetWaveVals(outStruct,-34,17.25,-34,17.75);
+waveVals = getSubsetWaveVals(outStruct,latStart,lonStart,latEnd,lonEnd);
 
 %% Calculate Wave Spectrum Params
 % lambda = g.*T.^2/2*pi;
@@ -21,7 +26,7 @@ waveVals = getSubsetWaveVals(outStruct,-34,17.25,-34,17.75);
 % k_y = k.*sin(testWaveDirection(1,1));
 
 %% Plot Wave Data on world map
-noaaDataPlot('miller',outStruct,'significantWavePeriod')
+noaaDataPlot('miller',outStruct,'windDirection')
 %% 3D plot
 % Instantiate variables
 image_size = 512;
@@ -36,6 +41,7 @@ f0 = 1./T0;
 %% Calculate S(\omega)
 %gamma_val = 1.308.*ones(size(Hs));
 gamma_val = 1.308;
+%%
 S = generateSingleJONSWAP(Hs,w0,gamma_val,w);
 % gamma_val = 1.308;
 % sigma = 0.07; % or 0.09
@@ -67,11 +73,30 @@ figure;
 
 hold on;
 m = length(waveVals.longitude);
-for i = 1:3
+for i = 1:2
     lat_index = ceil(i/m);
     lon_index = mod(i-1,m)+1;
     display_name = [num2str(waveVals.latitude(lat_index)), 'S, ' num2str(waveVals.longitude(lon_index)), 'E'];
+    % For plotting multiple lat vals
+    % switch lat_index
+    %     case 1
+    %         colourToPlot = "#0072BD";
+    %     case 2
+    %         colourToPlot = "#EDB120";
+    %     case 3 
+    %         colourToPlot = "#A2142F";
+    % end
+    % plot(w,S(:,i),'DisplayName',display_name, 'Color',colourToPlot);
     plot(w,S(:,i),'DisplayName',display_name);
+    maxIndex = find(S(:,i) == max(S(:,i)))
+    switch lon_index
+        case 1
+            colourToPlot = "#0072BD";
+        case 2              
+            colourToPlot = "#D95319";
+    end
+    S(maxIndex,i)
+    xline(w(maxIndex),LineWidth=1,DisplayName=['\omega = ',num2str(round(w(maxIndex),3))],Color=colourToPlot,LineStyle="--");
     %legend(["Wave spectrum at: ", num2str(testLat(lat_index)), ", " num2str(testLon(lon_index))]);
     %fprintf('Iteration %d: Latitude %.2f, Longitude %.2f\n', i, testLat(lat_index), testLon(lon_index));
 end
@@ -92,7 +117,7 @@ set(gca,'XTick',0:pi/2:2*pi)
 set(gca,'XTickLabel',{'0','\pi/2','\pi','3\pi/2','2\pi'})
 set(gca,'FontSize',12)
 legend('show')
-%matlab2tikz('../plots/waveSpec_toShore.tex');
+%matlab2tikz('../plots/valWaveSpec_toShore_1.tex');
 %% NonLinearity play around
 f_m = f0
 nLinOrder = (log(10).*(2*pi.*f_m)^4)./gamma_val.^2
@@ -183,7 +208,8 @@ set(gca,'FontSize',12)
 legend('show')
 %matlab2tikz('../plots/directionalSpreading.tex');
 %% Contour of 2D wave spectrum
-%E = E(:,:,2,2);
+E = E(:,:,1,2);
+%%
 figure;
 contour(x,y,E)
 yline(0);
@@ -250,7 +276,7 @@ nValidation(k,70,5);
 % Contour of 2D wave spectrum
 %E = E(:,:,2);
 figure;
-contour(k_x,k_y,E_k)
+contour(k_x_inv,k_y_inv,E_k)
 grid on;
 yline(0);
 xline(0);
@@ -261,7 +287,7 @@ xlabel('$k_{x}$','interpreter','latex'), ylabel('$k_{y}$','interpreter','latex')
 %set(gca,'YTick',-pi/2:pi/6:pi/2) 
 %set(gca,'YTickLabel',{'-\pi/2','-\pi/3','-\pi/6','0','\pi/6', '\pi/3', '\pi/2'})
 set(gca,'FontSize',12)
-%matlab2tikz('../plots/contour_E_k.tex');
+%matlab2tikz('../plots/Valcontour_E_k_inv.tex');
 %% 3D Spectrum
 figure;
 h=surf(k_x,k_y,E_k);

@@ -116,7 +116,7 @@ The variance density spectrum equation as described in Equation \ref{eq:waveSpec
     \underline{\eta}(x,y,t) = \sum_{i=1}^{N} \sum_{j=1}^{M} \underline{a}_{i,j}cos(\omega_{i}t-k_{i}xcos(\theta_{j}) - k_{i}ysin(\theta_{j}) + \underline{\phi}_{i,j})
 \end{equation}
 
-As seen in Equation \ref{eq:waveSpectrum.fourierSeries_3D}, each wave component is indicated by two indices.
+where each wave component is indicated by two indices.
 \begin{itemize}
     \item $i$: The frequency index or wave number
     \item $j$: The direction
@@ -128,7 +128,7 @@ Following the same process of transforming a one-dimensional amplitude spectrum 
     E(\omega,\theta) =  \lim_{\Delta \omega \to 0}\lim_{\Delta \theta \to 0}\frac{1}{\Delta \omega \Delta \theta} E\left \{ \frac{1}{2} \underline{a}^{2}\right \}
 \end{equation}
 
-Using the Jacobian, as seen in Equation \ref{eq:waveSpectrum.relateE(f)toE(w)}, the same relationship can be developed for the two-dimensional variance density spectrum
+Using the Jacobian determined in Equation \ref{eq:waveSpectrum.relateE(f)toE(w)}, the same relationship can be developed for the two-dimensional variance density spectrum
 
 \begin{equation} \label{eq:waveSpectrum.relateE(f)toE(w)_2D}
     E(\omega,\theta) =  \frac{1}{2\pi}E(f,\theta)
@@ -161,7 +161,7 @@ In order to define the two-dimensional wave-number spectrum, the method describe
     E(k_{x},k_{y}) = \lim_{\Delta k_{x} \to 0} \lim_{\Delta k_{y} \to 0} \frac{1}{\Delta k_{x} \Delta k_{y}} E\left \{ \frac{1}{2} \underline{a}^{2}\right \}
 \end{equation}
 
-With $k_{x} = kcos(\theta)$, and $k_{y} = ksin(\theta)$, $k$ and $\theta$ can be defined as: $k = \sqrt{k_{x}^2 + k_{y}^2}$ and $\theta = \text{arctan}(k_{y}/k_{x})$. This allows an equivalent spectrum to be defined in terms of $k$ and $\theta$.
+With $k_{x} = k\cos(\theta)$, and $k_{y} = k\sin(\theta)$, $k$ and $\theta$ can be defined as: $k = \sqrt{k_{x}^2 + k_{y}^2}$ and $\theta = \text{arctan}(k_{y}/k_{x})$. This allows an equivalent spectrum to be defined in terms of $k$ and $\theta$.
 
 \begin{equation} \label{eq:waveNumberSpectrum.SpectrumCont_2D_kTh}
     E(k,\theta) = \lim_{\Delta k \to 0} \lim_{\Delta \theta \to 0} \frac{1}{\Delta k \Delta \theta} E\left \{ \frac{1}{2} \underline{a}^{2}\right \}
@@ -207,7 +207,7 @@ Considering the harmonic surface profile of ocean waves, as well as the velocity
 
 \subsubsection{Dispersion Relationship} \label{subsec:theory.waves.dynamics.dispersionRelationship}
 
-The dispersion relationship relates the radian frequency, $\omega$, to the wave number, $k$. The dispersion relationship for an arbitrary depth is given as
+The dispersion relationship relates the radian frequency, $\omega$, to the wave number, $k$ \cite{Holthuijsen2007}. The dispersion relationship for an arbitrary depth is given as 
 
 \begin{equation} \label{eq:linearWaveTheory.dispersionRelationship}
     \omega ^2 = gk\text{tanh}(kd).
@@ -219,7 +219,7 @@ The propagation speed of a wave can be determined from Equation \ref{eq:linearWa
     c_{w} = \frac{g}{\omega}\text{tanh}(kd) = \sqrt{\frac{g}{k}\text{tanh}(kd)}
 \end{equation}
 
-Considering Equation \ref{eq:linearWaveTheory.dispersionRelationship} and \ref{eq:linearWaveTheory.phaseVelocity} for both deep water and shallow water yields the approximations to be determined.
+Considering Equation \ref{eq:linearWaveTheory.dispersionRelationship} and \ref{eq:linearWaveTheory.phaseVelocity} for both deep water and shallow water yields the following approximations to be determined.
 
 \subsubsection{Deep Water} \label{subsec:theory.waves.linearWaveTheory.deepWater}
 
@@ -266,7 +266,7 @@ These two waves combine to create a sequence of wave groups. This group reaches 
     \eta =  2a\text{cos} \left ( \frac{\omega_{1} - \omega_{2}}{2}t - \frac{k_{1} - k_{2}}{2}x \right ) \text{sin} \left ( \frac{\omega_{1} + \omega_{2}}{2}t - \frac{k_{1} + k_{2}}{2}x  \right )
 \end{equation}
 
-The cosine term acts as the envelope, while the sine term acts as the carrier wave. The phase velocity of the envelope represents the velocity of the wave group and can be derived as
+The cosine term acts as the envelope, while the sine term acts as the carrier wave \cite{Holthuijsen2007}. The phase velocity of the envelope represents the velocity of the wave group and can be derived as
 
 \begin{equation} \label{eq:addingTwoWaves.envelopeVelocity}
     c_{envelope} = c_{g} = \frac{(\omega_{1} + \omega_{2})/2}{(k_1 + k_2)/2} = \frac{\Delta \omega}{\Delta k}
@@ -351,7 +351,7 @@ and $s$ is related to the directional width, $\sigma_{\theta}$ by
     %\sigma_{\theta} = \sqrt{\frac{2}{s + 1}} \text{[rad]}
 \end{equation}
 
-A reasonable fit for $\sigma_{\theta}$ is given by
+A reasonable approximation for $\sigma_{\theta}$ is given by
 
 \begin{equation*}
   \sigma_{\theta} =
@@ -503,7 +503,7 @@ In order to see the drawback of \ac{rar} in terms of resolution, it is useful to
 
 The above example shows that a space-borne application of \acs{rar} results in a loss of cross-range resolution. In the context of this project, this is impractical as ocean waves need to be imaged and differentiated between.
 
-The limited resolution of \acs{rar} led to the development of \acs{sar}. This technology addresses the impact of antenna length by synthetically imitating a longer antenna length, which enhances the cross-range resolution as demonstrated in Equation \ref{eq:rar.crossrangeResolution}. This is accomplished through exploiting the Doppler shift phenomenon and capturing multiple images of the same scene. For a more comprehensive understanding of the mathematical and signal processing aspects involved in generating a \acs{sar}, refer to \cite{Cumming2005}.
+The limited resolution of \acs{rar} led to the development of \acs{sar}. This technology addresses the impact of antenna length by synthetically imitating a longer antenna length, which enhances the cross-range resolution. This is accomplished through exploiting the Doppler shift phenomenon and capturing multiple images of the same scene. For a more comprehensive understanding of the mathematical and signal processing aspects involved in generating a \acs{sar}, refer to \cite{Cumming2005}.
 
 
 The synthetic length of the antenna \cite{Meyer2019} used in calculating the cross-range resolution can be determined as
@@ -524,7 +524,7 @@ This, in turn, allows the cross-range resolution \cite{Moreira2013} for a \acs{s
     \delta_{cr_{SA}} = R\cdot \beta_{SA} = R \cdot \frac{\lambda}{2L_{SA}} = \frac{L_{ant}}{2}
 \end{equation}
 
-Using the previous example of a space-borne sensor with an antenna of length, 5\,m, it can be seen that \acs{sar} increases the cross-range resolution when compared to \acs{rar}.
+Using the previous example of a space-borne sensor with an antenna of length, 5\,m, it can be seen that \acs{sar} improves the cross-range resolution when compared to \acs{rar}.
 
 \begin{gather*}
     \delta_{cr_{SA}} = \frac{5\,\text{m}}{2} = 2.5\,\text{m}
@@ -628,8 +628,14 @@ Due to the fact that this project requires imaging ocean waves, fine-range resol
 
 \textbf{Speckle}
 
-Speckle, often noted for its "salt-and-pepper" appearance \cite{Meyer2019} in \acs{sar} images, results from the interference of multiple scatters within a resolution cell which leads to varying intensity values. Even when imaging a uniform surface, speckle exists due to phase variations amongst scatterers within the resolution cell, with brighter image regions exhibiting more intense speckle \cite{Moreira2013,Meyer2019}. Speckle is not an error in a \acs{sar} image, but a consequence of imaging with finite resolution. Higher resolution weakens the speckle effect as it reduces the number of scatterers within the resolution 
-cell \cite{Meyer2019}.
+Speckle, often noted for its "salt-and-pepper" appearance \cite{Meyer2019} in \acs{sar} images, results from the interference of multiple scatters within a resolution cell which leads to varying intensity values. Even when imaging a uniform surface, speckle exists due to phase variations amongst scatterers within the resolution cell, with brighter image regions exhibiting more intense speckle \cite{Moreira2013,Meyer2019}. Speckle is not an error in a \acs{sar} image, but a consequence of imaging with finite resolution. Higher resolution weakens the speckle effect as it reduces the number of scatterers within the resolution cell \cite{Meyer2019}. Unprocessed intensity VV \acs{grd} data is shown in Figure \ref{fig:theory.data.unprocessed} and speckle can be seen in both sub-scenes.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{Figures/Theory/unprocessedSARData.pdf}
+    \caption{Unprocessed \acs{grd} \acs{s1a} data.}
+    \label{fig:theory.data.unprocessed}
+\end{figure}
 
 \textbf{Thermal Noise}
 % Check spelling and grammar
@@ -642,21 +648,12 @@ Thermal noise significantly affects \acs{sar} image quality. It represents inher
 
 % In the context of \acs{s1a}, thermal noise plays an important role. Thermal noise is comprised of two sources of additive noise. The first is linked to the movement of the antenna and causes variability in the down-range direction. The second is known as scalloping noise\footnote{define scalloping noise} and varies in the cross-range direction \cite{Park2019}. Thermal noise impacts \acs{topsar} imaging mode more than others, particularly for cross-polarised images \cite{Park2018}. Furthermore, \acs{s1a} \acs{ew} mode \acs{sar} images, particularly those acquired over regions with a low backscatter, such as calm oceans and young smooth sea ice, are susceptible to thermal noise \cite{Carsey1992}.
 
-Removal of \acs{s1a} thermal noise results in improved image quality and can be visually seen in Figure \ref{fig:theory.data.thermalNoiseRemoval}.
+Removal of \acs{s1a} thermal noise results in improved image quality and can be visually seen in Figure \ref{fig:theory.data.thermalNoiseRemoval} when compared to Figure \ref{fig:theory.data.unprocessed}, particularly over land regions in the second sub-scene.
 
-\begin{figure} [H]
+\begin{figure}[H]
     \centering
-    \begin{subfigure}{0.95\textwidth}
-        \includegraphics[width=\textwidth]{Figures/Theory/unprocessedSARData.pdf}
-        \caption{Unprocessed \acs{grd} \acs{s1a} data.}
-        \label{fig:theory.data.thermalNoise.unprocessed}
-    \end{subfigure}   
-    \begin{subfigure}{0.95\textwidth}
-        \includegraphics[width=\textwidth]{Figures/Theory/thermalNoiseCalibratedSARData.pdf}
-        \caption{\acs{grd} \acs{s1a} data with thermal noise removed using \acs{snap}.}
-        \label{fig:theory.data.thermalNoise}
-    \end{subfigure} 
-    \caption{Comparison of unprocessed \acs{s1a} VV \acs{grd} data before and after removing thermal noise. Done in \acs{snap}.}
+    \includegraphics[width=0.85\textwidth]{Figures/Theory/thermalNoiseCalibratedSARData.pdf}
+    \caption{\acs{grd} \acs{s1a} data with thermal noise removed using \acs{snap}.}
     \label{fig:theory.data.thermalNoiseRemoval}
 \end{figure}
 
@@ -665,27 +662,19 @@ Removal of \acs{s1a} thermal noise results in improved image quality and can be 
 
 In \acs{sar} imaging, $\sigma_{0}$ represents the backscatter coefficient, which indicates the radar signal's strength reflected by scatterers. $\sigma_{0}$ is a dimensionless number that accounts for variations in factors like incidence angle, wavelength, polarisation, and surface properties. Radiometric calibration addresses \ac{rcs} variations, ensuring that pixel values in \acs{sar} images are both qualitatively representative and quantitatively aligned with $\sigma_{0}$. This process corrects radiometric bias present in raw \acs{sar} data, enabling its use in quantitative applications like target recognition and environmental monitoring. Calibration factors in the scattering area, antenna gain pattern, and range spread loss, enhance the accuracy and reliability of \acs{sar} data.
 
-Radiometric calibration of \acs{s1a} \acs{grd} data can be visually seen in Figure \ref{fig:theory.data.radiometricCalibration}.
+% Fact check
+Radiometric calibration of \acs{s1a} \acs{grd} data can be visually seen in Figure \ref{fig:theory.data.radiometric} over mountainous regions in both sub-scenes. This is due to the correction of backscatter bias which doesn't account for elevation changes.
 
 % In \acs{sar} imaging, $\sigma_{0}$ is known as the backscatter coefficient and acts as an indicator of the strength of radar signals reflected by scatterers. It provides a normalised dimensionless number that allows for comparing the observed signal strength to what would be expected from a standard one-square-meter area \cite{ElDarymli2014}. It's important to emphasise that $\sigma_{0}$ exhibits significant variations based on factors such as incidence angle, wavelength, polarisation, and the properties of the scattering surface itself. 
 
 % Radiometric calibration in SAR images is a vital process, and it primarily involves addressing the variations in \acs{rcs}, which quantifies the radar signal's strength reflected by distributed scatterers. Calibration ensures that pixel values in \acs{sar} images are not only qualitatively representative but also quantitatively aligned with the \acs{rcs} and backscatter coefficient, $\sigma_{0}$. Essentially, radiometric calibration rectifies the radiometric bias present in the raw \acs{sar} data, making it suitable for a wide array of quantitative applications. This calibration process includes adjustments for factors like scattering area, antenna gain pattern, and range spread loss, guaranteeing the accuracy and reliability of \acs{sar} data for applications such as target recognition and environmental monitoring.
 
 % Update calibrated image
-\begin{figure} [H]
+\begin{figure}[H]
     \centering
-    \begin{subfigure}{0.95\textwidth}
-        \includegraphics[width=\textwidth]{Figures/Theory/unprocessedSARData.pdf}
-        \caption{Unprocessed \acs{grd} \acs{s1a} data.}
-        \label{fig:theory.data.radiometric.unprocessed}
-    \end{subfigure}   
-    \begin{subfigure}{0.95\textwidth}
-        \includegraphics[width=\textwidth]{Figures/Theory/thermalNoiseCalibratedSARData.pdf}
-        \caption{Radiometrically calibrated \acs{grd} \acs{s1a} data done using \acs{snap}.}
-        \label{fig:theory.data.radiometric}
-    \end{subfigure}     
-    \caption{Comparison of unprocessed \acs{s1a} VV \acs{grd} data before and after radiometric calibration. Done in \acs{snap}.}
-    \label{fig:theory.data.radiometricCalibration}
+    \includegraphics[width=0.85\textwidth]{Figures/Theory/radiometricCalibratedSARData.pdf}
+    \caption{Radiometrically calibrated \acs{grd} \acs{s1a} data done using \acs{snap}.}
+    \label{fig:theory.data.radiometric}
 \end{figure}
 
 \begin{itemize}
@@ -707,11 +696,15 @@ To interpret polarimetric SAR data effectively, it is helpful to consider how di
 
 \subsubsection{Scattering}
 
-Scattering phenomena are fundamental to understanding how satellite sensors detect and interpret \acs{em} waves. Scattering on the Earth's surface involves two primary processes: surface and volume scattering. Surface roughness plays a critical role in \acs{em} backscatter. A flat or specular surface behaves like a mirror, reflecting radiation back to the sensor only when the surface aligns perpendicularly with the sensor's line of sight. This occurs with flat surfaces, nadir-looking sensors, or tilted surfaces, such as mountains or water surface waves. In contrast, rougher surfaces scatter a portion of incident EM radiation back toward the sensor. When the surface has a regular structure, such as waves with a specific wavelength, it can result in positive interference, a phenomenon known as Bragg scattering. %This effect is especially prominent at microwave frequencies, where ripple waves on water have wavelengths on the order of the EM wavelength.
+Scattering is important to understand how satellite sensors detect and interpret \acs{em} waves. Scattering on the Earth's surface involves two primary processes: surface and volume scattering. Surface roughness plays a critical role in \acs{em} backscatter. A flat or specular surface\footnote{Define specular surface} behaves like a mirror, reflecting radiation back to the sensor only when the surface aligns perpendicularly with the sensor's line of sight. This occurs with flat or tilted surfaces, such as mountains or ocean surface waves. In contrast, rougher surfaces scatter a portion of incident EM radiation back toward the sensor. 
 
-Bragg scattering is of particular interest in the context of ocean waves. This phenomenon is characterised by the constructive interference of incoming and backscattered \acs{em} radiation due to the regular structure of waves. This creates high backscatter values, especially when microwave frequencies are involved. The key factor for Bragg scattering's occurrence is the consistency between the wavelength of the electromagnetic waves and the spacing between wave crests. Bragg scattering enables radar instruments like scatterometers and Synthetic Aperture Radar (SAR) sensors to capture information about surface waves on the ocean, aiding in various applications like wave height and wind speed retrieval.
+When the surface has a regular structure, such as waves with a specific wavelength, it can result in positive interference, a phenomenon known as Bragg scattering. Bragg scattering is of particular interest in the context of ocean waves and is caused by short ripple waves on the ocean surface \cite{Hasselmann1991}. This phenomenon is characterised by the constructive interference of incoming and backscattered \acs{em} radiation due to the regular structure of waves. This creates high backscatter values. The key factor for Bragg scattering's occurrence is the consistency between the wavelength of the electromagnetic waves and the spacing between wave crests.
 
-Bragg scattering is casued by short ripple waves on the ocean surface \cite{Hasselmann1991}
+% Bragg scattering enables radar instruments like scatterometers and Synthetic Aperture Radar (SAR) sensors to capture information about surface waves on the ocean, aiding in various applications like wave height and wind speed retrieval. 
+
+%This effect is especially prominent at microwave frequencies, where ripple waves on water have wavelengths on the order of the EM wavelength. 
+
+
 
 \begin{figure} [H]
     \centering
@@ -833,7 +826,7 @@ The \acp{mtf} described in Equations \ref{eq:hh.rar.TR_k_sum}, \ref{eq:hh.rar.Tt
 \subsubsection{Spectral Expansion} \label{subsubsec:theory.hasselmann.sarImaging.spectralExpansion}
 %\textbf{Spectral Expansion}
 
-The functions described in Equations \ref{eq:hh.var.fv}, \ref{eq:hh.var.fR} and \ref{eq:hh.var.fRv} can, using the Fourier Transform, be expanded into spectral expansion terms using the following equations. $\Omega_n$ is the Fourier Transform operator given by $\frac{1}{4\pi}\int d\underline{r}e^{-i\underline{k}\cdot \underline{r}}$ \cite{Hasselmann1991}.
+The functions described in Equations \ref{eq:hh.var.fv}, \ref{eq:hh.var.fR} and \ref{eq:hh.var.fRv} can, using the Fourier Transform, be expanded into spectral expansion terms using the following equations. $\Omega_n$ is the Fourier Transform operator given by $\frac{1}{4\pi}\int d\underline{r}e^{-i\underline{k}\cdot \underline{r}}$ \cite{Hasselmann1991}, which represents a two-dimensional \ac{fft}.
 
 \begin{equation} \label{eq:hh.ft.2n}
     P^S_{n,2n} = \Omega_n \left \{ \frac{f^v(\underline{r})^n}{n!} \right \}

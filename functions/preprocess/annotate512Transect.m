@@ -25,7 +25,7 @@ function [textLabel] = addNumberLabel(xOfRect, yOfRect, number, colour, bg)
 % bg is either 1 or 0, where 1 represents the prescence of a white
 % background, and 0 represents no background for the text
     if bg
-        textLabel = text(xOfRect+256,yOfRect+256,num2str(number),'FontSize',10,'Color',colour,'BackgroundColor','w');
+        textLabel = text(xOfRect+256,yOfRect+256,num2str(number),'FontSize',16,'Color',colour,'BackgroundColor','w');
     end
-    textLabel = text(xOfRect+256,yOfRect+256,num2str(number),'FontSize',10,'Color',colour);
+    textLabel = text(xOfRect+256,yOfRect+256,num2str(number),'FontSize',16,'Color',colour);
 end

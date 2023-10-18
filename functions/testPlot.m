@@ -3,47 +3,54 @@
 n = 3;
 
 % Test getting values
-ncImport = ncinfo('D:\UCT\EEE4022S\Data\CPT\small_subset.nc');
-VV_nc = ncread('D:\UCT\EEE4022S\Data\CPT\small_subset.nc','Sigma0_VV');
-[transectData_nc, startPos_nc] = get512Transects(VV_nc,1,1,45,n);
+ncImport = ncinfo('D:\UCT\EEE4022S\Data\CPT\landSeaCP.nc');
+VV_nc = ncread('D:\UCT\EEE4022S\Data\CPT\landSeaCP.nc','Sigma0_VV');
+%%
+[transectData_nc, startPos_nc] = get512Transects(VV_nc,1,1,30,n);
+[transectData_th, startPos_th] = get512Transects(th,1,1,30,n);
 %[transectData2, startPos2] = get512Transects(data_VV_larger,1,1,45,n);
 
-% Test metadata
+%% Test metadata
 meta_nc = ncinfo('D:\UCT\EEE4022S\Data\CPT\larger_subset.nc','metadata');
 req_atributes = ["MISSION","orbit_cycle","first_line_time","antenna_pointing","PASS","centre_heading","slant_range_to_first_pixel","centre_lat","centre_lon","total_size"];
 %req_atributes = ["MISSION","SWATH", "BEAMS", "ABS_ORBIT"];
 meta_nc = filterAttributesNetCDF(meta_nc.Attributes, req_atributes);
+%% RMSE
+transectRMSE_1_2 = sum(rmse(transectData_nc(:,:,1),transectData_nc(:,:,2)));
+transectRMSE_1_3 = sum(rmse(transectData_nc(:,:,1),transectData_nc(:,:,3)));
+transectRMSE_2_3 = sum(rmse(transectData_nc(:,:,2),transectData_nc(:,:,3)));
+transectRMSE_same = sum(rmse(transectData_nc(:,:,1),transectData_nc(:,:,1))); 
+transectMSE_1_2 = transectRMSE_1_2^2;
+transectMSE_1_3 = transectRMSE_1_3^2;
+transectMSE_2_3 = transectRMSE_2_3^2;
+transectMSE_1_1 = transectRMSE_same^2;
 
-figure(1)
+transectMSEStruct = transectMSE(transectData_nc);
+
+%%
+figure;
 imshow(VV_nc)
+%title('S1A VV data from 28-Jul-2023 at 34.78S,16.77E with transects at 30$\degree$ shown',Interpreter='latex');
 hold on;
 
 for i = 1:n
-    annotate512Transect(startPos_nc(i,1),startPos_nc(i,2),i,'w','black',1);
+    annotate512Transect(startPos_nc(i,1),startPos_nc(i,2),i,'red','black',1);
 end
 
-title('VV with transects')
 hold off
 % 
-figure(2)
-subplot(2,3,1)
+figure;
+subplot(1,3,1)
 imshow(transectData_nc(:,:,1));
-title('VV Transect 1 20 deg')
-subplot(2,3,2)
+%title('VV Transect 1 30 deg')
+%figure;
+subplot(1,3,2)
 imshow(transectData_nc(:,:,2));
-title('VV Transect 2 20 deg')
-subplot(2,3,3)
+%title('VV Transect 2 30 deg')
+%figure;
+subplot(1,3,3)
 imshow(transectData_nc(:,:,3));
-title('VV Transect 3 20 deg')
-subplot(2,3,4)
-imshow(transectData_nc(:,:,4));
-title('VV Transect 4 20 deg')
-subplot(2,3,5)
-imshow(transectData_nc(:,:,5));
-title('VV Transect 5 20 deg')
-subplot(2,3,6)
-imshow(transectData_nc(:,:,6));
-title('VV Transect 6 20 deg')
+%title('VV Transect 3 30 deg')
 
 %% Plot - M-Map (SAR)
 titlestr='Test SAR Plot with m-maps';
