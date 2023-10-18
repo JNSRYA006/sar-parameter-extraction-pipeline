@@ -35,7 +35,7 @@
 \usepackage{tabularx}
 \usepackage{booktabs}
 \usepackage{cite}
-\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage[usenames,dvipsnames,table,xcdraw]{xcolor}
 \usepackage{graphicx}					% Can include graphics
 \usepackage{float}						% Can place figures at exact places in text
 \usepackage{wrapfig}					% Can wrap text around figures
@@ -78,7 +78,10 @@
 \usetikzlibrary{plotmarks}
 \usetikzlibrary{arrows.meta}
 \usepgfplotslibrary{patchplots}
+\usepackage{longtable}
+%\usepackage[table,xcdraw]{xcolor}
 \usepackage{grffile}
+\usepackage{pdfpages}
 \makeglossaries
 
 % Update chapter size before heading
@@ -117,6 +120,18 @@
     urlcolor=linkColour,
     citecolor=linkColour,
 }
+
+%---------------------------------------------------------------------
+% 	CONTOUR LINE COLOUR FORMATTING
+%---------------------------------------------------------------------
+
+\definecolor{100m}{HTML}{AA0000}
+\definecolor{200m}{HTML}{FFAA00}
+\definecolor{25m}{HTML}{00AA00}
+\definecolor{50m}{HTML}{FF55FF}
+\definecolor{250m}{HTML}{AAAA00}
+\definecolor{500m}{HTML}{55007F}
+\definecolor{750m}{HTML}{AAAAFF}
 
 %---------------------------------------------------------------------
 % 	LISTING FORMATTING
@@ -424,8 +439,11 @@ I, \auth,  hereby:
 \include{Chapters/7_discussion}
 \include{Chapters/8_conclusion}
 
+\appendix
 \include{Appendices/A_appendix}
 \include{Appendices/B_appendix}
+\include{Appendices/C_appendix}
+\include{Appendices/D_appendix}
 
 %=====================================================================
 %	BACK MATTER

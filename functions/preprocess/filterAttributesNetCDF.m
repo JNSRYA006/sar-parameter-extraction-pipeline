@@ -1,6 +1,6 @@
 function metadata = filterAttributesNetCDF(metadata_struc, attribute)
 % filterAttributesNetCDF takes in a structure containing metadata (obtained
-% using meta_nc = ncinfo(filepath','metadata');), as well as a list of strings of the
+% using meta_nc = ncinfo(filepath,'metadata');), as well as a list of strings of the
 % desired attributes to filter. A list of available attribute types are
 % available here: 
 % The function outputs a 1xlength(attributes) structure with all the

@@ -37,12 +37,12 @@ As detailed in xxx, this project required wave parameter extraction for use in a
 \end{figure}
 
 % Word better and slim down - ADD DISCUSSION ON WAVE SPECTRUM GENERATION
-The five functional blocks were identified as \textsc{pre-processing}, \textsc{metadata extraction}, \textsc{\acs{sar} spectrum calculation}, \textsc{wave spectrum generation}, and \textsc{inversion}. The \textsc{pre-processing} block involves the use of the \ac{snap} Toolbox developed by \ac{esa} as well as \textsc{matlab}, developed by MathWorks Inc. The \textsc{pre-processing} block reads in a downloaded \acs{sar} Level-1 \ac{grd} data file and outputs a \textsc{matlab} structure of \lstinline[columns=fixed]{n} equal-sized transects. These equal-sized transects can be input to the \textsc{inversion} block. The output \ac{netcdf} file from \acs{snap} is used to generate views of \acs{sar} data in \textsc{matlab}, as well as storing the metadata for the \textsc{metadata extraction} block. The \ac{netcdf} file is read by the \textsc{metadata extraction} block and outputs the desired metadata values required for the \textsc{\acs{sar} spectrum calculation} block. The \textsc{\acs{sar} spectrum calculation} block reads in a wave spectrum sourced from \ac{ncep} and generates a \acs{sar} spectrum of the provided wave spectrum. This generated \acs{sar} spectrum is input to the \textsc{inversion} block along with the output of the \textsc{metadata extraction} block. The \textsc{inversion} block outputs the wave parameters from the input \acs{sar} data.
+The five functional blocks were identified as \textsc{pre-processing}, \textsc{metadata extraction}, \textsc{\acs{sar} spectrum calculation}, \textsc{wave spectrum generation}, and \textsc{inversion}. The \textsc{pre-processing} block involves the use of the \ac{snap} Toolbox developed by \ac{esa} as well as \textsc{Matlab}, developed by MathWorks Inc. The \textsc{pre-processing} block reads in a downloaded \acs{sar} Level-1 \ac{grd} data file and outputs a \textsc{Matlab} structure array\footnote{In \textsc{Matlab}, a structure array is a type of data that organises related data into groups. These groups are indexed using an associated field value which can hold any particular data type. More information on structure arrays can be found in the \href{https://www.mathworks.com/help/matlab/ref/struct.html}{\textsc{Matlab} documentation}. The rest of this report will refer to structure arrays simply as structures.} of \lstinline[columns=fixed]{n} equal-sized transects. These equal-sized transects can be input to the \textsc{inversion} block. The output \ac{netcdf} file from \acs{snap} is used to generate views of \acs{sar} data in \textsc{Matlab}, as well as storing the metadata for the \textsc{metadata extraction} block. The \ac{netcdf} file is read by the \textsc{metadata extraction} block and outputs the desired metadata values required for the \textsc{\acs{sar} spectrum calculation} block. The \textsc{\acs{sar} spectrum calculation} block reads in a wave spectrum sourced from \ac{ncep} and generates a \acs{sar} spectrum of the provided wave spectrum. This generated \acs{sar} spectrum is input to the \textsc{inversion} block along with the output of the \textsc{metadata extraction} block. The \textsc{inversion} block outputs the wave parameters from the input pre-processed \acs{sar} data.
 % Will still change
 \begin{figure}[H]
     \centering
     \includegraphics[width=.95\linewidth]{Figures/PipelineDesign/4022_pipeline.pdf}
-    \caption{Pipeline system design for this project broken down further than the entire pipeline shown in Figure \ref{fig:systemDesign.wholeProject} containing all the required metadata and external models required, along with the part of the process that they are required.}
+    \caption{Pipeline system design for the scope of this project broken down further than the entire pipeline shown in Figure \ref{fig:systemDesign.wholeProject}. All the required metadata and external models are shown, along with the part of the process that they are required.}
     \label{fig:systemDesign.scope}
 \end{figure}
 %====================================================
@@ -53,9 +53,9 @@ The five functional blocks were identified as \textsc{pre-processing}, \textsc{m
 
 \subsection{Overview} \label{subsec:systemDesign.preProcessing.Overview}
 
-The pre-processing block of the pipeline was designed in a hybrid manner, with part of the pre-processing done in the \ac{snap} toolbox developed by \ac{esa} prior to the use of \textsc{matlab} tools. The pre-processing block was designed to have an overall function of reading in \ac{s1a} data, apply the desired pre-processing techniques to the \acs{sar} data, and take 512x512 pixel sized transects of this larger \acs{sar} data. The applied pre-processing techniques to calibrate \acs{sar} data for wave parameter extraction were on the recommendation of Giacomo De Carolis and Francesca De Santi of the \acs{irea}, however, discussion around the use of different processing techniques is presented in Chapter \ref{chap:discussion}. The design of this block was designed to keep pre-processing outside of the \textsc{matlab} environment to a minimum, through the use of external tools. 
+The pre-processing block of the pipeline was designed in a hybrid manner, with part of the pre-processing done in the \ac{snap} toolbox developed by \ac{esa} prior to the use of \textsc{Matlab} tools. The pre-processing block was designed to have an overall function of reading in \ac{s1a} data, apply the desired pre-processing techniques to the \acs{sar} data, and take 512x512 pixel sized transects of this larger \acs{sar} data. The applied pre-processing techniques to calibrate \acs{sar} data for wave parameter extraction were on the recommendation of Giacomo De Carolis and Francesca De Santi of the \acs{irea}, however, discussion around the use of different processing techniques is presented in Chapter \ref{chap:discussion}. The design of this block was designed to keep pre-processing outside of the \textsc{Matlab} environment to a minimum, through the use of external tools. 
 
-The pre-processing block had six notable stages: Thermal noise calibration of \acs{s1a} \acs{grd} data, radiometric calibration of these data, extraction of individual pixel incidence angle, exporting calibrated \acs{grd} data to a usable format for \textsc{matlab}, reading in the exported data, and taking 512x512 pixel transects of the larger \acs{sar} data. The flow of this block of the pipeline is shown graphically in Figure \ref{fig:systemDesign.preProcessing.blockDiagram}.
+The pre-processing block had six notable stages: Thermal noise calibration of \acs{s1a} \acs{grd} data, radiometric calibration of these data, extraction of individual pixel incidence angle, exporting calibrated \acs{grd} data to a usable format for \textsc{Matlab}, reading in the exported data, and taking 512x512 pixel transects of the larger \acs{sar} data. The flow of this block of the pipeline is shown graphically in Figure \ref{fig:systemDesign.preProcessing.blockDiagram}.
 
 \begin{figure}[H]
     \centering
@@ -66,53 +66,176 @@ The pre-processing block had six notable stages: Thermal noise calibration of \a
 
 \subsection{Thermal Noise Calibration} \label{subsec:systemDesign.preProcessing.thermalNoise}
 
-After obtaining \acs{grd} \acs{sar} data from \href{scihub.copernicus.eu/dhus/#/home}{Copernicus SciHub}, the first sub-block of the pre-processing block was Thermal Noise Calibration
+After obtaining \acs{grd} \acs{sar} data from \href{scihub.copernicus.eu/dhus/#/home}{Copernicus SciHub}, the first sub-block of the pre-processing block was Thermal Noise Calibration. \acs{s1a} data contains large amounts of thermal noise and as such, \acs{snap} contains a built-in function called \lstinline{S-1 Thermal Noise Removal}. For this block, this function was implemented in \acs{snap} Desktop and is detailed in \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/[pipeline.mlx]}{\lstinline{pipeline.mlx}}.
 
 \subsection{Radiometric Calibration} \label{subsec:systemDesign.preProcessing.radiometric}
 
+After removing thermal noise from \acs{grd} \acs{sar} data, the second sub-block of the pre-processing block was Radiometric Calibration. \acs{snap} contains a built-in function called \lstinline{Calibrate} within the \lstinline{Radiometric} block of functions. For this block, this function was implemented in \acs{snap} Desktop and is detailed in \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/[pipeline.mlx]}{\lstinline{pipeline.mlx}}.
+
 \subsection{Incidence Angle Extraction} \label{subsec:systemDesign.preProcessing.incidenceAngle}
 
-\subsection{\acs{netcdf} Export} \label{subsec:systemDesign.preProcessing.exportNetCDF}
-% Discuss why netcdf
-\subsection{MATLAB Data Import} \label{subsec:systemDesign.preProcessing.importData}
+Due to the fact that the incidence angle varies for each pixel in \acs{sar} data, this exact per-pixel incidence angle is required in order to calculate Equations \ref{eq:hh.rar.Tt_k}, \ref{eq:hh.motion.Tv_k}, which form part of the co and autocovariance functions described in Section \ref{subsec:theory.hasselmann.sarImaging}. In order to achieve this, multiple approaches were investigated. 
 
-The first sub-block in the \textsc{matlab} implementation of the pre-processing block was called \lstinline{ncread}. As discussed above, the \acs{netcdf} file format was used for all imported data into \textsc{matlab} due to its use in xxxx.
+Firstly, the metadata file from \acs{s1a} \acs{grd} data was found to contain near and far-look incidence angles. The initial idea to extract individual pixel incidence angle values was to use \textsc{Matlab}'s built-in \lstinline{linspace} function which creates an evenly spaced vector over the range of values. This was an incorrect implementation as the incidence angle is not a linear relation to the latitude and longitude of an image. Furthermore, this method meant that each longitude of the image contained the same incidence angle value, and only the latitude of the image changed.
 
-\subsection{Take Transects and Subdivide Data} \label{subsec:systemDesign.preProcessing.transects}
+Secondly, a second type of metadata from \acs{s1a} \acs{grd} data was investigated. This metadata was in the form of a tie-point grid, which provided a 4x4 matrix of incidence angle data, using \lstinline{linspace} on this metadata resulted in a per-pixel incidence angle value which changed in latitude, as well as longitude which is an improvement from the first method.
 
-The most important part of the pre-processing for wave parameter extraction for use in sea ice parameter extraction is the ability to 'follow' the flow of ocean waves into the \acs{miz}. To achieve this, transects of a fixed size are taken of open ocean scenes as well as sea ice scenes. This allows the way in which ocean waves propagate through sea ice to be studied, and due to this, sea ice parameters are able to be extracted using the models described in Section \ref{subsec:litReview.sarCharac.seaIceWaveModelling}. As per \cite{Wadhams2004,DeSanti2018} the size of these transects should be 512x512 pixels in size. Taking transects of a larger image in \textsc{matlab} is relatively straightforward, however, these transects need to be able to be taken at an angle to follow the direction of the visible ocean waves. If the ocean wave direction is not followed, this could cause issues in determining the way in which ocean waves are attenuated in the \acs{miz}. Along with this, the transect needs to start at a certain location of the whole scene. Due to the fact that latitude and longitude are not encoded in the \acs{s1a} \ac{grd} data, it was decided that a pixel starting position would be used to determine the starting position.
+Finally, tie-point grid data was exported as a band using \acs{snap} Desktop. The way in which this is achieved is detailed in \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/[pipeline.mlx]}{\lstinline{pipeline.mlx}}. These data provide a pixel-by-pixel value of the incidence angle on the \acs{s1a} data. Exporting the tie-point grid as a band, allows this band to be imported in \textsc{Matlab} using the \lstinline{ncread} function discussed in Section \ref{subsec:systemDesign.preProcessing.importData}.
 
-Due to the way in which \textsc{matlab} indexes arrays, which is counter-intuitive to other programming languages, with the initial index being given a value of \textsc{1}, a check that the start location of the first transect was a valid index in the imported sarData needed to be conducted. This was achieved using a simple \lstinline{if} statement.
+In order to decide which method to use, plots of these data were generated over a range of pixel values. Figure \ref{fig:systemDesign.preProcessing.incidence}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=.95\linewidth]{Figures/PipelineDesign/transects_w_SAR.pdf}
-    \caption{Transect of full \acs{sar} data geometry.}
+    \begin{subfigure}{0.48\linewidth}
+        \centering
+        \resizebox{\linewidth}{!}{\input{Figures/PipelineDesign/4_tiePoint_incidence}}
+        \caption{Second implemented method to obtain incidence angle. 4x4 tie-point grid.}
+        \label{fig:systemDesign.preProcessing.incidence.4_tie}
+    \end{subfigure}   
+    \begin{subfigure}{0.48\linewidth}
+        \centering    
+        \resizebox{\linewidth}{!}{\input{Figures/PipelineDesign/linspcae_incidence}}
+        \caption{Second implemented method to obtain incidence angle. \lstinline{linspace} of 4x4 tie-point grid.}
+        \label{fig:systemDesign.preProcessing.incidence.4_tie.linspace}        
+    \end{subfigure}
+    \subcaptionbox{Third implemented method to obtain incidence angle. Exported band of incidence angle tie-point grid.\label{fig:systemDesign.preProcessing.incidence.pixel_tie}}[0.48\linewidth]{
+        \resizebox{\linewidth}{!}{\input{Figures/PipelineDesign/pixel_tiePoint_incidence}}
+    }
+        \subcaptionbox{Difference between Figures \ref{fig:systemDesign.preProcessing.incidence.4_tie.linspace} and \ref{fig:systemDesign.preProcessing.incidence.pixel_tie}.\label{fig:systemDesign.preProcessing.incidence.difference}}[0.48\linewidth]{
+        \resizebox{\linewidth}{!}{\input{Figures/PipelineDesign/difference_incidence}}
+    }   
+    \caption{Comparison of incidence angle data from 28-Jul-2023 at 34.78S, 16.77E. The second two methods discussed in Section \ref{subsec:systemDesign.preProcessing.incidenceAngle} are shown visually as a coloured image corresponding to associated incidence angle values, as indicated in the respective colour bars.}
+    \label{fig:systemDesign.preProcessing.incidence}
+\end{figure}
+
+% Disucssion of plots (Look in ClickUp)
+
+
+\subsection{\acs{netcdf} Export} \label{subsec:systemDesign.preProcessing.exportNetCDF}
+% Discuss why netcdf
+\acs{snap} Desktop allows a multitude of export options for pre-processed data. The choice of export data type was narrowed down to data formats which contained metadata, as well as the \acs{sar} data. A list of these formats is shown below.
+
+\begin{itemize}
+    \item GeoTIFF
+    \item BEAM-DIMAP
+    \item \ac{envi}
+    \item \ac{hdf}5
+    \item \ac{netcdf}4
+\end{itemize}
+
+In order to decide which file format to export data as from \acs{snap} Desktop, an analysis of the compatibility of each file format with \textsc{Matlab} was done and the following was found.
+
+A GeoTIFF file can be read into \textsc{Matlab} using the \lstinline{readgeoraster} function built into the Mapping Toolbox provided by \textsc{Matlab}. BEAM-DIMAP is a file format used by \acs{snap} products, and cannot be imported to \textsc{Matlab}. An \ac{envi} file can be read into \textsc{Matlab} to extract metadata using the \lstinline{enviinfo} function built into the Image Processing Toolbox by \textsc{Matlab}. A \acs{hdf}5 file can be displayed and read in \textsc{Matlab} using a variety of functions built into \textsc{Matlab} such as the \lstinline{h5disp} and \lstinline{h5read} functions. Finally, a \acs{netcdf}4 file can, as with \acs{hdf}5 files, be displayed and read in \textsc{Matlab} using a variety of functions built into \textsc{Matlab}.
+
+Of the 5 export file types, only BEAM-DIMAP cannot be read into \textsc{Matlab}. Due to the desire to only use built-in \textsc{Matlab} functions and not make use of external toolboxes, this left \acs{hdf}5 and \acs{netcdf}4 as the two file types to be chosen from. Both file formats are able to be loaded as a structure in \textsc{Matlab}, and as such are both desirable choices. However, exporting \acs{sar} data from \acs{snap} was faster when exporting as \acs{netcdf} as opposed to \acs{hdf}. Furthermore, \acs{ncep} data was downloaded as a \acs{netcdf} file, and in order to keep consistency, \acs{netcdf} was chosen as the file type to export from \acs{snap} Desktop.
+
+\subsection{Matlab Data Import} \label{subsec:systemDesign.preProcessing.importData}
+
+The first sub-block in the \textsc{Matlab} implementation of the pre-processing block was called \lstinline{ncread}. As discussed in Section \ref{subsec:systemDesign.preProcessing.exportNetCDF}, the \acs{netcdf} file format was used for all imported data into \textsc{Matlab}. The \href{https://www.mathworks.com/help/Matlab/ref/ncread.html}{\lstinline{ncread}} \textsc{Matlab} function was used to import the exported data from \acs{snap} Desktop.
+
+In order to access different bands within the \acs{netcdf} file, different variable names were used as a second input parameter to the \href{https://www.mathworks.com/help/Matlab/ref/ncread.html}{\lstinline{ncread}} functions. Listing \ref{code:netCDFImport} details the required variable names to extract the two bands of interest required for each subsequent block, and sub-block in Figure \ref{fig:systemDesign.scope}.
+
+\begin{lstlisting}[caption={\textsc{Matlab} code used to import all desired bands from exported \acs{netcdf} data from \acs{snap} Desktop.},label={code:netCDFImport}]
+filepath = "D:\UCT\EEE4022S\Data\CPT\export_data.nc";
+VV = ncread(filepath,'Sigma0_VV'); % Intensity VV pre-processed data
+th = ncread(filepath,'Incidence_Angle'); % Incidence Angle band
+\end{lstlisting}
+
+By utilising \href{https://www.mathworks.com/help/Matlab/ref/ncread.html}{\lstinline{ncread}} to extract data, this assigns both \lstinline{VV} and \lstinline{th} variables to a nxm sized matrix, where n and m respectively represent the size of the \acs{sar} data in terms of cross-range and range directions. The extraction of metadata is detailed in Section \ref{subsec:systemDesign.metadata.import}.
+
+
+
+\subsection{Take Transects and Subdivide Data} \label{subsec:systemDesign.preProcessing.transects}
+
+The most important part of the pre-processing for wave parameter extraction for use in sea ice parameter extraction is the ability to 'follow' the flow of ocean waves into the \acs{miz}. To achieve this, transects of a fixed size are taken of open ocean scenes as well as sea ice scenes. This allows the way in which ocean waves propagate through sea ice to be studied, and due to this, sea ice parameters are able to be extracted using the models described in Section \ref{subsec:litReview.sarCharac.seaIceWaveModelling}. As per \cite{Wadhams2004,DeSanti2018} the size of these transects should be 512x512 pixels in size. Taking transects of a larger image in \textsc{Matlab} is relatively straightforward, however, these transects need to be able to be taken at an angle to follow the direction of the visible ocean waves. If the ocean wave direction is not followed, this could cause issues in determining the way in which ocean waves are attenuated in the \acs{miz}. Along with this, the transect needs to start at a certain location of the whole scene. Due to the fact that latitude and longitude are not encoded in the \acs{s1a} \ac{grd} data, it was decided that a pixel starting position would be used to determine the starting position.
+
+Due to the way in which \textsc{Matlab} indexes arrays, which is counter-intuitive to other programming languages, with the initial index being given a value of \textsc{1}, a check that the start location of the first transect was a valid index in the imported sarData needed to be conducted. This was achieved using a simple \lstinline{if} statement. The way in which angled transects were designed to be taken is visually represented in Figure \ref{fig:systemDesign.transects}. 
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.65\linewidth]{Figures/PipelineDesign/transects_w_SAR.pdf}
+    \caption{Implemented geometry for taking transects of full \acs{sar} scene.}
     \label{fig:systemDesign.transects}
 \end{figure}
 
+$\theta$, in Figure \ref{fig:systemDesign.transects}, represents the user-supplied angle at which to take the $n$ number of 512x512 transects measured clockwise from the +$x$-axis. $x_{1},y_{1}$ represent the user-supplied pixel starting location at which transects should be taken from. The \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/preprocess/get512Transects.m}{\lstinline{get512Transects}} function was designed to incorporate all of these design decisions, and as a result, takes in the full scene of \acs{sar} data, the top left $x$ and $y$ coordinates, as well as the user-defined angle, $\theta$ and number of transects, $n$. \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/preprocess/get512Transects.m}{\lstinline{get512Transects}} returns a 512x512x$n$ array of the transects of the full scene, along with a $n$x4 matrix of the corner pixel values of each transect. As well as using the \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/preprocess/get512Transects.m}{\lstinline{get512Transects}} function to take transects of the \acs{sar} image, the function can also be used to take transects of the \lstinline{th} variable determined in Listing \ref{code:netCDFImport}. The returned variable for \lstinline{th} follows the same form as discussed above for \acs{sar} data.
+
+In order to annotate the transects, the \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/preprocess/annotate512Transects.m}{\lstinline{annotate512Transects}} function was designed which allowed the user to control the colour of the transect outline, as well as text colour and need for a background on the text colour. Using both the \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/preprocess/get512Transects.m}{\lstinline{get512Transects}} and \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/preprocess/annotate512Transects.m}{\lstinline{annotate512Transects}} functions allowed the plots in Figure \ref{fig:systemDesign.transectSample} to be generated. The ability to view individual transects is desired to be able to follow the direction of waves within the \acs{sar} scene.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.65\linewidth}
+        \centering
+        \includegraphics[width=\linewidth]{Figures/PipelineDesign/VVSceneWTransects.pdf}
+        \caption{Full \acs{s1a} VV scene.}
+        \label{fig:systemDesign.transectSample.full}
+    \end{subfigure}   
+    \begin{subfigure}{0.95\linewidth}
+        \centering    
+        \includegraphics[width=\linewidth]{Figures/PipelineDesign/VVAllTransects.pdf}
+        \caption{Transects 1 through 3 of Figure \ref{fig:systemDesign.transectSample.full} taken at 30$\degree$.}
+        \label{fig:systemDesign.transectSample.all}        
+    \end{subfigure}
+    \caption{\acs{s1a} Intensity VV data, pre-processed according to Section \ref{sec:systemDesign.preProcessing}, from 28-Jul-2023 at 34.78\,S, 16.77\,E with transects at 30$\degree$ for $x_{1},y_{1} = 1,1$ displayed and labelled. Respective individual transects are shown.}
+    \label{fig:systemDesign.transectSample}
+\end{figure}
+% Including geometry
+% \begin{figure}[H]
+%     \centering
+%     \begin{subfigure}{0.48\linewidth}
+%         \centering
+%         \includegraphics[width=\linewidth]{Figures/PipelineDesign/VVSceneWTransects.pdf}
+%         \caption{Full \acs{s1a} VV scene.}
+%         \label{fig:systemDesign.transectSample.full}
+%     \end{subfigure}   
+%     \begin{subfigure}{0.48\linewidth}
+%         \centering
+%         \includegraphics[width=\linewidth]{Figures/PipelineDesign/transects_w_SAR.pdf}
+%         \caption{Full \acs{s1a} VV scene.}
+%         \label{fig:systemDesign.transectSample.full}
+%     \end{subfigure}    
+%     \begin{subfigure}{0.95\linewidth}
+%         \centering    
+%         \includegraphics[width=\linewidth]{Figures/PipelineDesign/VVAllTransects.pdf}
+%         \caption{Transects 1 through 3 of Figure \ref{fig:systemDesign.transectSample.full} taken at 30$\degree$.}
+%         \label{fig:systemDesign.transectSample.all}        
+%     \end{subfigure}
+%     \caption{\acs{s1a} Intensity VV data, pre-processed according to Section \ref{sec:systemDesign.preProcessing}, from 28-Jul-2023 at 34.78\,S, 16.77\,E with transects at 30$\degree$ for $x_{1},y_{1} = 1,1$ displayed and labelled. Respective individual transects are shown.}
+%     \label{fig:systemDesign.transectSample}
+% \end{figure}
+
+%====================================================
+% METADATA EXTRACTION
+%====================================================
+\section{Metadata Extraction} \label{sec:systemDesign.metadata}
+
+\subsection{Overview} \label{subsec:systemDesign.metadata.overview}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.85\linewidth]{Figures/PipelineDesign/metadataExtraction.pdf}
+    \caption{Block diagram depicting an expanded metadata extraction sub-block of Figure \ref{fig:systemDesign.scope}}
+    \label{fig:systemDesign.metadata.blockDiagram}
+\end{figure}
+
+\subsection{Data Import} \label{subsec:systemDesign.metadata.import}
+
+The first sub-block of the metadata extraction block was called \lstinline{ncinfo}. As discussed in Section \ref{subsec:systemDesign.preProcessing.exportNetCDF}, the \acs{netcdf} file format was used for importing data into \textsc{Matlab}. The \href{https://www.mathworks.com/help/Matlab/ref/ncinfo.html}{\lstinline{ncinfo}} \textsc{Matlab} function was used to import the exported data from \acs{snap} Desktop.
+
+In order to access the exported metadata within the \acs{netcdf} file the \href{https://www.mathworks.com/help/Matlab/ref/ncinfo.html}{\lstinline{ncinfo}} \textsc{Matlab} function was used. Listing \ref{code:netCDFImport} details the required variable name to extract the metadata for the subsequent sub-block in Figure \ref{fig:systemDesign.metadata.blockDiagram}.
+
+\begin{lstlisting}[caption={\textsc{Matlab} code used to import metadata from exported \acs{netcdf} data from \acs{snap} Desktop.},label={code:netCDFImport.metadata}]
+filepath = "D:\UCT\EEE4022S\Data\CPT\export_data.nc";
+metadata = ncinfo(filepath,'metadata'); % Extract all metadata
+\end{lstlisting}
+
+Using \href{https://www.mathworks.com/help/Matlab/ref/ncinfo.html}{\lstinline{ncinfo}} to extract metadata, assigns the \lstinline{metadata} variable to a $1$x$1$ structure with all desired metadata in the \texttt{Attributes} field which can be parsed to the \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/preprocess/annotate512Transects.m}{\lstinline{filterAttributesNetCDF}} sub-block.
 
 
-Obtain SAR look over region of interest - want VV and HH polarisation data (mainly used VV)
+\subsection{Filter Attributes} \label{subsec:systemDesign.metadata.filter}
 
-Start by doing pre-processing in SNAP ESA tool
-\begin{enumerate}
-    \item Thermal noise calibration
-    \item Radiometric Calibration using intensity in linear units
-\end{enumerate}
-
-Export pre-processed data as netCDF file and save path
-
-Import path into MATLAB. Will save desired band data as n x m double of intensity/amplitude values. Able to plot full look in MATLAB. [Need to figure out how to get image rotated by 180 deg ccw/cw]
-
-Transects:
-use get512Transects function. Enter data to take transect of, top left x coord, top left y coord, angle of the transects from + x axis, number of transects(n). Outputs a n x 2 matrix of sar data, and corner pixel values.
-
-Can plot full look showing the location of transects in full look using defined colours and number of transects. Can plot individual transects. Transects will be used to see the evolution of wave parameters across a region
-
-Metadata:
-
-All the required metadata can be extracted using the extractMetadata function. Need to provide the ncread(path,'metadata') output. This returns a structure with the metadata name and value. Certain, different values can be extracted using the filterAttributes function
+The \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/preprocess/annotate512Transects.m}{\lstinline{filterAttributesNetCDF}} block takes in a structure containing metadata, as well as a list of strings of the desired attributes to keep from all metadata values. Exact attribute names can be found in Table \ref{tab:ap.metadataVals} in Appendix \ref{ap:metadata}. The function outputs a \texttt{1xlength(reqAttributes)} structure with two columns: \texttt{Name} and \texttt{Value}. Additional metadata formatting functions are discussed in Section \ref{sec:systemDesign.sarSpectrum} and \ref{sec:systemDesign.inversion} when required by respective \acp{mtf}.
 
 %====================================================
 % WAVE SPECTRUM GENERATION
@@ -126,7 +249,7 @@ All the required metadata can be extracted using the extractMetadata function. N
 \begin{figure}[H]
     \centering
     \includegraphics[width=.95\linewidth]{Figures/PipelineDesign/wave_spectrum.pdf}
-    \caption{Block diagram depicting an expanded wave spectrum generation sub-block of Figure \ref{fig:systemDesign.scope}}
+    \caption{Block diagram depicting an expanded wave spectrum generation sub-block of Figure \ref{fig:systemDesign.scope}.}
     \label{fig:systemDesign.wavesSpectrum.blockDiagram}
 \end{figure}
 
@@ -134,8 +257,26 @@ All the required metadata can be extracted using the extractMetadata function. N
 
 \subsection{GRIB2 to \acs{netcdf} Conversion} \label{subsec:systemDesign.waveSpectrum.toNetCDF}
 
-\subsection{Wave Parameter Extraction} \label{subsec:systemDesign.waveSpectrum.parameters}
+\subsection{Defining Location} \label{subsec:systemDesign.defineLocation}
 
+The \textsc{defineLocation} sub-block in Figure \ref{fig:systemDesign.wavesSpectrum.blockDiagram} is vital to the generation of wave spectra due to the limitation of the resolution of \acs{ncep} wave data. \acs{ncep} wave data had 0.25\,degree resolution in both latitude and longitude directions, and due to the fact that the region of interest, the CSIR directional wave buoy located at $34.20400000\degree$\,S, $18.28666944\degree$\,E is not located at the points available in \acs{ncep} wave data, a grid of latitude and longitude coordinates needed to be generated surrounding the point of interest. 
+
+This was achieved in \textsc{Matlab} using the \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/waveSpectra/generateSingleJONSWAP.m}{\lstinline{createLatLonGrid}} function which creates two arrays of length 3, with the three closest latitude and longitude values based on the provided latitude, longitude and resolution of wave data. This allows surrounding wave data to be extracted as detailed in Section \ref{subsec:systemDesign.waveSpectrum.parameters}. A sample output of running Listing \ref{code:latLonExtract.grid} is shown in Listing \ref{output:latLonExtract.grid}.
+
+\begin{lstlisting}[caption={\textsc{Matlab} code used to define grid values of latitude and longitude.},label={code:latLonExtract.grid}]
+latitude = 34.20400000;     % Input latitude
+longitude = -18.28666944;   % Input longitude
+resolution = 0.25;          % Resolution in degrees
+[grid_lat, grid_lon] = createLatLonGrid(latitude, longitude, resolution);
+\end{lstlisting}
+
+\lstinputlisting[float=h,frame=tb,caption=\textsc{Matlab} output of Listing \ref{code:latLonExtract.grid}.,label={output:latLonExtract.grid}]{Figures/PipelineDesign/latLonGrid.txt}
+
+Listing \ref{output:latLonExtract.grid} displays a 1x3 array where the centre value represents the closest value to the given \lstinline{latitude} and \lstinline{longitude} in Listing \ref{code:latLonExtract.grid}. These arrays are used in the \textsc{extractWaveParams} sub-block to define the location over which to extract wave parameters and this process is discussed in Section \ref{subsec:systemDesign.waveSpectrum.parameters}.
+
+
+\subsection{Wave Parameter Extraction} \label{subsec:systemDesign.waveSpectrum.parameters}
+% Intro to structures and why we want these values
 
 When examining the latitude and longitude values obtained from \acs{ncep}, it was noted that these data points contained decimal points of order $10^{-6}$. This proved an issue when trying to index the original downloaded wave data to access a subset of these data using the code snippet depicted in Listing \ref{code:latLonExtract.initial}. This code resulted in none of the desired data being found.
 
@@ -159,7 +300,7 @@ lonIndex = find(round(lon,5) == lonVal);
 
 Whilst the generation of a one-dimensional wave spectrum is only represented by one sub-block in Figure \ref{fig:systemDesign.wavesSpectrum.blockDiagram}, the generation of this spectrum is vital to forming the foundation of the two-dimensional wave spectrum which is used as a first-guess wave spectrum when minimising the cost function described in Equation \ref{eq:hh.inversion.J}. As discussed in Section \ref{subsec:theory.waves.modelling}, the most widely used wave model is the \acs{jonswap} model, and implementing this spectrum required a careful approach in order to ensure accurate modelling of waves was done using the downloaded wave data detailed in Section \ref{subsec:systemDesign.waveSpectrum.download}.
 
-In order to construct a \acs{jonswap} wave model, $E(\omega)$, the equations detailed in Section \ref{subsec:theory.waves.modelling} were implemented in \textsc{matlab} as outlined in the pseudocode given in Algorithm \ref{alg:jonswap} where $H_{1/3}$ and $w_{peak}$ are wave parameters as detailed in Section \ref{subsec:theory.waves.waveSpectrum} and $\omega$ is the range of frequencies over which to generate the wave spectrum for. as well as defining which geographical coordinate to construct the wave spectrum for. 
+In order to construct a \acs{jonswap} wave model, $E(\omega)$, the equations detailed in Section \ref{subsec:theory.waves.modelling} were implemented in \textsc{Matlab} as outlined in the pseudocode given in Algorithm \ref{alg:jonswap} where $H_{1/3}$ and $w_{peak}$ are wave parameters as detailed in Section \ref{subsec:theory.waves.modelling} and $\omega$ is the range of frequencies over which to generate the wave spectrum for. as well as defining which geographical coordinate to construct the wave spectrum for. 
 %% Mention how we know what gamma value to use
 
 
@@ -206,8 +347,8 @@ In order to construct a \acs{jonswap} wave model, $E(\omega)$, the equations det
     }
     
     $E1 \leftarrow \alpha \cdot g^2 \cdot (\omega(k)^{-5}) \cdot \exp\left(-\frac{5}{4} \cdot \left ( \frac{\omega_{peak}}{\omega(k)}\right)^4\right)$\;
-    $exponent \leftarrow  \exp\left(- \frac{(\omega(k) - \omega_0)^2}{2 \cdot (\sigma \cdot \omega_0)^2}\right) $ \;
-    $E2 \leftarrow \gamma^{exponent}$\;
+    $\text{exponent} \leftarrow  \exp\left(- \frac{(\omega(k) - \omega_0)^2}{2 \cdot (\sigma \cdot \omega_0)^2}\right) $ \;
+    $E2 \leftarrow \gamma^{\text{exponent}}$\;
     
     $E \leftarrow E1 \cdot E2$\;
 }
@@ -308,7 +449,7 @@ In order to extend the one-dimensional wave spectrum into a two-dimensional wave
 \end{figure}
 
 % Generate 2D spectrum from 1D eq
-In accordance with Equation xx, the two-dimensional directional wave spectrum can be obtained by multiplying the one-dimensional wave spectrum, $E(\omega)$, with the directional distribution function, $D(\theta)$. This was achieved using the \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/waveSpectra/generate2DWaveSpectrum.m}{\lstinline{generate2DWaveSpectrum}} block, which took in the one-dimensional wave spectrum, and the directional distribution function and simply performed an element-wise multiplication using \textsc{matlab}'s built-in 'dot' multiplication. This resulted in the two-dimensional wave spectrum shown in Figure \ref{fig:systemDesign.2DSampleWaveSpectrum}
+In accordance with Equation xx, the two-dimensional directional wave spectrum can be obtained by multiplying the one-dimensional wave spectrum, $E(\omega)$, with the directional distribution function, $D(\theta)$. This was achieved using the \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/waveSpectra/generate2DWaveSpectrum.m}{\lstinline{generate2DWaveSpectrum}} block, which took in the one-dimensional wave spectrum, and the directional distribution function and simply performed an element-wise multiplication using \textsc{Matlab}'s built-in 'dot' multiplication. This resulted in the two-dimensional wave spectrum shown in Figure \ref{fig:systemDesign.2DSampleWaveSpectrum}
 % INCREASE SURF FONT SIZE
 \begin{figure} [H]
     \centering
@@ -332,7 +473,7 @@ In accordance with Equation xx, the two-dimensional directional wave spectrum ca
 
 \subsection{Wave-number Spectrum} \label{subsec:systemDesign.waveSpectrum.waveNumberSpectrum}
 
-Converting the two-dimensional wave spectrum generated in Section \ref{subsec:systemDesign.waveSpectrum.2DSpectrum} to a two-dimensional wave-number spectrum for use in the \ac{hh} procedure, required implementing Equation \ref{eq:waveNumberSpectrum.relateE(kx,ky)toE(w,th)_2D} in \textsc{matlab} code. In order to implement this equation, the wave speed as described in Equation \ref{eq:linearWaveTheory.phaseVelocity} was used to determine the individual wave speed at the known depth of the region of interest. Following on from this, $n$ needed to be determined as per Equation \ref{eq:addingTwoWaves.n} to determine the group wave speed, $c_{g}$ as detailed in Equation \ref{eq:addingTwoWaves.groupVelocity}. After determining all of these variables for the specific wave spectrum, the wave-number spectrum could be determined using the relationship between the two-dimensional wave spectrum and two-dimensional wave-number spectrum as detailed in Equation \ref{eq:waveNumberSpectrum.relateE(kx,ky)toE(w,th)_2D}. To see the change between the wave spectrum, and wave-number spectrum, a contour and surface plot are provided in Figure \ref{fig:systemDesign.2DSampleWaveNumSpectrum} of the equivalent wave spectrum shown in Figure \ref{fig:systemDesign.2DSampleWaveSpectrum}.
+Converting the two-dimensional wave spectrum generated in Section \ref{subsec:systemDesign.waveSpectrum.2DSpectrum} to a two-dimensional wave-number spectrum for use in the \ac{hh} procedure, required implementing Equation \ref{eq:waveNumberSpectrum.relateE(kx,ky)toE(w,th)_2D} in \textsc{Matlab} code. In order to implement this equation, the wave speed as described in Equation \ref{eq:linearWaveTheory.phaseVelocity} was used to determine the individual wave speed at the known depth of the region of interest. Following on from this, $n$ needed to be determined as per Equation \ref{eq:addingTwoWaves.n} to determine the group wave speed, $c_{g}$ as detailed in Equation \ref{eq:addingTwoWaves.groupVelocity}. After determining all of these variables for the specific wave spectrum, the wave-number spectrum could be determined using the relationship between the two-dimensional wave spectrum and two-dimensional wave-number spectrum as detailed in Equation \ref{eq:waveNumberSpectrum.relateE(kx,ky)toE(w,th)_2D}. To see the change between the wave spectrum, and wave-number spectrum, a contour and surface plot are provided in Figure \ref{fig:systemDesign.2DSampleWaveNumSpectrum} of the equivalent wave spectrum shown in Figure \ref{fig:systemDesign.2DSampleWaveSpectrum}.
 
 \begin{figure} [H]
     \centering
@@ -349,7 +490,7 @@ Converting the two-dimensional wave spectrum generated in Section \ref{subsec:sy
 
 \section{\acs{sar} Spectrum} \label{sec:systemDesign.sarSpectrum}
 
-\subsection{\acf{mtf}s} \label{subsec:systemDesign.sarSpectrum.mtfs}
+\subsection{\acfp{mtf}} \label{subsec:systemDesign.sarSpectrum.mtfs}
 
 \subsection{Co and Autocovariance Functions} \label{subsec:systemDesign.sarSpectrum.coAutoFunc}
 

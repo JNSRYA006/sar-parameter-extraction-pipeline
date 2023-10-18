@@ -1,12 +1,12 @@
 %% Required files
 % Import data
-filepath = "D:\UCT\EEE4022S\Data\CPT\larger_subset_incidence.nc";
+filepath = "D:\UCT\EEE4022S\Data\CPT\smaller_subset_incidence.nc";
 %[Filename,filepath]=uigetfile('*.nc','Choose the exported .nc file from SNAP');
 %vfilen=[filepath,Filename];
 % Import data values
 ncImport = ncinfo(filepath);
 %VV_nc = ncread(filepath,'Sigma0_VV');
-VV_nc = transectData_nc(:,:,4);
+VV_nc = transectData_nc(:,:,3);
 %% Required Metadata
 metadata = ncinfo(filepath,'metadata');
 th = ncread(filepath,'Incidence_Angle');
@@ -114,6 +114,15 @@ n=1;
     end
 %end
 P_s = p_s_coeff.*P_s;
+
+figure;
+%contour(k_x,k_y, 20*log10(abs(P_s)));
+surf(k_x,k_y, 20*log10(abs(P_s)),'lineStyle','none');
+xlabel('k_x')
+ylabel('k_y')
+%zlabel('20log(abs(P^S))')
+title('Power Spectrum, P^S')
+%colorbar;
 %% Testing filter functions - HRK
 xi_sqr = 70.^2;
 mu_Th = 0.5;

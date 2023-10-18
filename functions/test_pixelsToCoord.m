@@ -1,6 +1,6 @@
 %% Test pixel values to be mapped to corresponding latitude and longitude
 % Import data
-filepath = "D:\UCT\EEE4022S\Data\CPT\small_subset.nc";
+filepath = "D:\UCT\EEE4022S\Data\CPT\smaller_subset_incidence.nc";
 % Number of Transects
 n = 2;
 

@@ -1,16 +1,21 @@
 %% Testing find closest lat and long
-latitude = 35.15;     % Input latitude
-longitude = -100.7; % Input longitude
+diary('latLonGrid.txt')
+diary on;
+latitude = -34.20400000;     % Input latitude
+longitude = 18.28666944; % Input longitude
 resolution = 0.25;   % Resolution in degrees
 
-[closest_lat, closest_lon] = findClosestLatLon(latitude, longitude, resolution);
-
-fprintf('Closest Latitude: %.2f\n', closest_lat);
-fprintf('Closest Longitude: %.2f\n', closest_lon);
-
-grid_size = 1;       % Size of the grid around the desired coordinates
+% [closest_lat, closest_lon] = findClosestLatLon(latitude, longitude, resolution);
+% 
+% fprintf('Closest Latitude: %.2f\n', closest_lat);
+% fprintf('Closest Longitude: %.2f\n', closest_lon);
+% 
+% grid_size = 1;       % Size of the grid around the desired coordinates
 
 [grid_lat, grid_lon] = createLatLonGrid(latitude, longitude, resolution);
+grid_lat
+grid_lon
+diary off;
 
 %% Calculate orbital velocity
 % Time average over period during which scattering element is viewed by SAR
@@ -23,57 +28,48 @@ func = helperFunctions;
 %% Getting incidence angle per pixel
 % Only northern hemisphere has been exported manually for pixel-by pixel
 % values
+func = helperFunctions;
 incidence_1 = ncread(filepath,'Incidence_Angle');
 incidence_2 = ncread(filepath,'incident_angle');
 incidence_2_linspace = double(func.resize(incidence_2,incidence_1));
 % Plot values
-figure;
-imagesc(incidence_1);
-title('Exported Incidence Angle Tie-Point Grid from SNAP ESA');
-ylabel('Latitude (pixels)');
-xlabel('Longitude (pixels)')
-cb = colorbar;  % create and label the colorbar
-cb.Label.String = 'Incidence Angle, \theta (degrees)';
-
-figure;
-imagesc(incidence_2);
-title('Incidence Angle Tie-Point Grid from SNAP ESA');
-ylabel('Latitude (pixels)');
-xlabel('Longitude (pixels)')
-cb = colorbar;  % create and label the colorbar
-cb.Label.String = 'Incidence Angle, \theta (degrees)';
-
-figure;
-imagesc(incidence_2_linspace);
-title('Linspace of Incidence Angle Tie-Point Grid from SNAP ESA');
-ylabel('Latitude (pixels)');
-xlabel('Longitude (pixels)')
-cb = colorbar;  % create and label the colorbar
-cb.Label.String = 'Incidence Angle, \theta (degrees)';
 %%
 figure;
-subplot(1,3,1);
-imagesc(incidence_1);
-title('Exported Incidence Angle Tie-Point Grid from SNAP ESA');
-ylabel('Latitude (pixels)');
-xlabel('Longitude (pixels)')
+imagesc(incidence_2);
+%title('Incidence Angle Tie-Point Grid from SNAP ESA');
+%ylabel('Latitude (pixels)');
+%xlabel('Longitude (pixels)')
 cb = colorbar;  % create and label the colorbar
-cb.Label.String = 'Incidence Angle, \theta (degrees)';
-subplot(1,3,2);
+cb.Label.String = 'Incidence Angle, \theta [degrees]';
+matlab2tikz('../plots/4_tiePoint_incidence.tex');
+
+figure;
 imagesc(incidence_2_linspace);
-title('Linspace of Incidence Angle Tie-Point Grid from SNAP ESA');
-ylabel('Latitude (pixels)');
-xlabel('Longitude (pixels)')
+%title('Linspace of Incidence Angle Tie-Point Grid from SNAP ESA');
+ylabel('Latitude [pixels]');
+xlabel('Longitude [pixels]');
 cb = colorbar;  % create and label the colorbar
-cb.Label.String = 'Incidence Angle, \theta (degrees)';
-subplot(1,3,3)
+cb.Label.String = 'Incidence Angle, \theta [degrees]';
+matlab2tikz('../plots/linspcae_incidence.tex');
+
+figure;
+imagesc(incidence_1);
+%title('Exported Incidence Angle Tie-Point Grid from SNAP ESA');
+ylabel('Latitude [pixels]');
+xlabel('Longitude [pixels]');
+cb = colorbar;  % create and label the colorbar
+cb.Label.String = 'Incidence Angle, \theta [degrees]';
+matlab2tikz('../plots/pixel_tiePoint_incidence.tex');
+
+figure;
 difference = abs(incidence_1 - incidence_2_linspace);
 imagesc(difference);
-title('Difference between Exported Tie-Point Grid and Linspace of Incidence Angle');
-ylabel('Latitude (pixels)');
-xlabel('Longitude (pixels)')
+%title('Difference between Exported Tie-Point Grid and Linspace of Incidence Angle');
+ylabel('Latitude [pixels]');
+xlabel('Longitude [pixels]');
 cb = colorbar;  % create and label the colorbar
-cb.Label.String = 'Difference in Incidence Angle, \theta (degrees)';
+cb.Label.String = 'Difference in \theta [degrees]';
+matlab2tikz('../plots/difference_incidence.tex');
 %% Getting orbit velocities
 updated_attributes = cell(3, 17);
 
@@ -201,19 +197,4 @@ function [closest_lat, closest_lon] = findClosestLatLon(latitude, longitude, res
     % Find the closest longitude value
     [~, lon_index] = min(abs(lon_grid - longitude));
     closest_lon = lon_grid(lon_index);
-end
-
-function [lat_range, lon_range] = createLatLonGrid(latitude, longitude, resolution)
-    % Define the latitude and longitude grid based on the given resolution
-    lat_grid = -90:resolution:90;
-    lon_grid = -180:resolution:180;
-    grid_size = 1;
-
-    % Find the closest latitude and longitude values
-    [~, lat_index] = min(abs(lat_grid - latitude));
-    [~, lon_index] = min(abs(lon_grid - longitude));
-    
-    % Create arrays of latitude and longitude coordinates around the desired coordinates
-    lat_range = lat_grid(lat_index-grid_size:lat_index+grid_size);
-    lon_range = lon_grid(lon_index-grid_size:lon_index+grid_size);
 end

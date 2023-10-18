@@ -64,7 +64,9 @@ for i = 1:length(k_x)
 end
 
 p_s_ql = exp(-(k_x).^2*xi_sqr);
-p_s_ql = func.resize(p_s_ql(1:index),waveSpectrum(1,:));
+if ~index == 0
+    p_s_ql = func.resize(p_s_ql(1:index),waveSpectrum(1,:));
+end
 end
 
 function beta = getBeta(metadata,orbit_vec_start,num_orbit_vectors,velocity_value_choice)
