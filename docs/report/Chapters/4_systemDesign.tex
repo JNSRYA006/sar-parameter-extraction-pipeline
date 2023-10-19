@@ -23,11 +23,11 @@ This chapter's objective is to detail the core design process of this project, a
 % \end{figure}
 
 
-This chapter begins by providing an overview of the entire pipeline - part of which falls outside of the scope of this project, however, this context is relevant in terms of giving context to the desired results for this project in the context of the broader goals of this pipeline. Each subsequent section will unpack the four main sub-modules within the pipeline in a respective section. Each of these sections will further break down the sub-module into smaller blocks which make up the sub-module. The use of block diagrams allows the process the be understood in terms of the flow of the pipeline, and block diagrams are used throughout this chapter to break down higher-level processes. The variable and function names utilised in this chapter, match those used in the \textsc{Matlab} pipeline.
+This chapter begins by providing an overview of the entire pipeline - part of which falls outside of the scope of this project, however, this context is relevant in terms of giving context to the desired results for this project in the context of the broader goals of this pipeline. Each subsequent section will unpack the five main sub-modules within the pipeline in a respective section. Each of these sections will further break down the sub-module into smaller blocks which make up the sub-module. The use of block diagrams allows the process the be understood in terms of the flow of the pipeline, and block diagrams are used throughout this chapter to break down higher-level processes. The variable and function names utilised in this chapter, match those used in the \textsc{Matlab} pipeline.
 
 \section{Overview} \label{sec:systemDesign.overview}
 
-As detailed in xxx, this project required wave parameter extraction for use in a sea ice parameter extraction pipeline. This entire system design is shown as a block diagram in Figure \ref{fig:systemDesign.wholeProject}. It is evident from Figure \ref{fig:systemDesign.wholeProject}, which parts of the \acs{sar} sea ice parameter are relevant to this project. A more detailed block diagram of the wave parameter extraction process is shown in Figure \ref{fig:systemDesign.scope} and within this pipeline, five main functional blocks were identified and are highlighted by five unique colours. [ADD WAVE SPECTRUM GENERATION PIECES]
+As detailed in xxx, this project required wave parameter extraction for use in a sea ice parameter extraction pipeline. This entire system design is shown as a block diagram in Figure \ref{fig:systemDesign.wholeProject}. It is evident from Figure \ref{fig:systemDesign.wholeProject}, which parts of the \acs{sar} sea ice parameter are relevant to this project. A more detailed block diagram of the wave parameter extraction process is shown in Figure \ref{fig:systemDesign.scope} and within this pipeline, five main functional blocks were identified and are highlighted by five unique colours. [ADD WAVE SPECTRUM GENERATION PIECES] [MENTION USE OF STRUCTURES THROUGHT]
 % Will still change
 \begin{figure}[H]
     \centering
@@ -254,6 +254,24 @@ The \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/ma
 \end{figure}
 
 \subsection{Wave Data Download} \label{subsec:systemDesign.waveSpectrum.download}
+
+\acs{ncep} \acs{noaa} wave data is available in 6-hour intervals. These intervals are 00, 06, 12, and 18 hours in UTC time. As \acs{s1a} captures are not set to exact time intervals, a function \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/waveSpectra/generateSingleJONSWAP.m}{\lstinline{getNOAAParams}} was created which took in the \acs{s1a} capture datetime object, obtained using the \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/waveSpectra/generateSingleJONSWAP.m}{\lstinline{getCaptureData}} function, and outputted two strings. Both of these strings were formatted as per the \acs{url} used to download \acs{ncep} wave data. 
+
+The way in which the closest hour value was determined was using the code extract from \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/waveSpectra/generateSingleJONSWAP.m}{\lstinline{getNOAAParams}} shown in Listing \ref{code:waveSpec.download.closestHour}. 
+
+\begin{lstlisting}[caption={Initial implementation of \textsc{Matlab} code to extract wave parameters at certain geographical location.},label={code:waveSpec.download.closestHour}]
+noaaHour = datetime(SARCaptureDate,"Format","HH:mm");
+noaaHour = double(hour(noaaHour));
+allowedHours = [0,6,12,18];
+hourDiff = abs(allowedHours - noaaHour);
+[~,hourIndex] = min(hourDiff);
+nearestHour = allowedHours(hourIndex);
+\end{lstlisting}
+
+The date of the \acs{s1a} capture was extracted using \textsc{Matlab}'s built-in \lstinline{datetime} function. The form of the date and hour value required by \acs{ncep} was of the form \texttt{YYYYMMDD} and \texttt{HH} respectively. To achieve this, the \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/waveSpectra/generateSingleJONSWAP.m}{\lstinline{getNOAAParams}} used basic string handling after extracting all individual values. Interestingly, isolating a month or day from a datetime object with a numeric value $<$ 10 in \textsc{Matlab}, resulted in a single character. As \acs{ncep} required two characters for both of these parameters, a simple \lstinline{if} statement checked the length of the value, and updated them accordingly if they had length 1 by prepending a \texttt{0} to the front of the single character value.
+
+These functions allowed associated wave data to be downloaded for the corresponding \acs{s1a} data.
+
 
 \subsection{GRIB2 to \acs{netcdf} Conversion} \label{subsec:systemDesign.waveSpectrum.toNetCDF}
 
@@ -488,7 +506,39 @@ Converting the two-dimensional wave spectrum generated in Section \ref{subsec:sy
 \end{figure}
 
 
-\section{\acs{sar} Spectrum} \label{sec:systemDesign.sarSpectrum}
+\section{\acs{sar} Spectrum of Ocean Waves} \label{sec:systemDesign.sarSpectrum}
+
+\subsection{Additional Metadata Extraction} \label{subsec:systemDesign.sarSpectrum.metadata}
+
+The \acs{mtf}s described in Section \ref{subsec:theory.hasselmann.sarImaging} each required some form of metadata from \acs{s1a} \acs{sar} data in order to be calculated. These metadata values are tabulated in Table \ref{tab:additionalMetadata} along with additional functions that were developed in order to get the extracted metadata in the correct form for implementing the \acs{mtf} equations.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\multicolumn{1}{|c|}{\textbf{\acs{mtf}}} & \multicolumn{1}{c|}{\textbf{Required Metadata Values}} & \multicolumn{1}{c|}{\textbf{\begin{tabular}[c]{@{}c@{}}Additional Metadata \\ Functions\end{tabular}}} \\ \hline
+Tilt \acs{mtf} & Polarisation, Incidence Angle, Look & \begin{tabular}[c]{@{}l@{}}\href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/hasselmann/helperFunctions.m}{\lstinline{defineKLook}}, \\ \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/hasselmann/helperFunctions.m}{\lstinline{lookDiscretise}}\end{tabular} \\ \hline
+Hydrodynamic \acs{mtf} & \multicolumn{1}{c|}{-} & \multicolumn{1}{c|}{-} \\ \hline
+\acs{rar} \acs{mtf} & Polarisation, Incidence Angle, Look & \begin{tabular}[c]{@{}l@{}}\href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/hasselmann/helperFunctions.m}{\lstinline{defineKLook}}, \\ \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/hasselmann/helperFunctions.m}{\lstinline{lookDiscretise}}\end{tabular} \\ \hline
+Range Velocity \acs{mtf} & Incidence Angle, Look & \begin{tabular}[c]{@{}l@{}}\href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/hasselmann/helperFunctions.m}{\lstinline{defineKLook}}, \\ \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/hasselmann/helperFunctions.m}{\lstinline{lookDiscretise}}\end{tabular} \\ \hline
+Velocity Bunching \acs{mtf} & \begin{tabular}[c]{@{}l@{}}Incidence Angle, Look\\ Slant Range, Capture Time\end{tabular} & \begin{tabular}[c]{@{}l@{}}\href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/hasselmann/helperFunctions.m}{\lstinline{defineKLook}},\\ \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/hasselmann/helperFunctions.m}{\lstinline{lookDiscretise}}, \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/hasselmann/helperFunctions.m}{\lstinline{getBeta}},\\ \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/hasselmann/helperFunctions.m}{\lstinline{getSatVelocity}}\end{tabular} \\ \hline
+\acs{sar} Imaging \acs{mtf} & \begin{tabular}[c]{@{}l@{}}Polarisation, Incidence Angle, Look,\\ Slant Range, Capture Time\end{tabular} & \begin{tabular}[c]{@{}l@{}}\href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/hasselmann/helperFunctions.m}{\lstinline{defineKLook}},\\ \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/hasselmann/helperFunctions.m}{\lstinline{lookDiscretise}}, \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/hasselmann/helperFunctions.m}{\lstinline{getBeta}},\\ \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/hasselmann/helperFunctions.m}{\lstinline{getSatVelocity}}\end{tabular} \\ \hline
+\end{tabular}
+\caption{Metadata values required for each individual \acs{mtf} used in the \acs{sar} spectrum generation of ocean waves. Additional functions created are named.}
+\label{tab:additionalMetadata}
+\end{table}
+
+The metadata values shown in the \textbf{Required Metadata Values} column of Table \ref{tab:additionalMetadata} are simply extracted using the \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/preprocess/annotate512Transects.m}{\lstinline{filterAttributesNetCDF}} function with the appropriate required attributes chosen from Table \ref{tab:ap.metadataVals}. However, in order to implement the \acs{mtf}s correctly, certain additional functions are required to get this metadata into the correct form or be used to calculate another value.
+
+In the case of \acs{s1a}'s look, \acs{hh} requires that the component of the wave-number vector in the radar look direction is calculated. These coordinates are chosen such that the $x$-axis represents the \acs{sar} satellite flight direction, and the $y$-axis points in the positive or negative look direction, $l$, for a left or right looking \acs{sar} satellite respectively \cite{Hasselmann1991}. Therefore, the \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/hasselmann/helperFunctions.m}{\lstinline{lookDiscretise}} function classified the extracted look value from the metadata as either \texttt{1} or \texttt{0} where the look of \acs{s1a} was \texttt{left} or \texttt{right} respectively. After this, the \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/hasselmann/helperFunctions.m}{\lstinline{defineKLook}} function determined, based on the output of \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/hasselmann/helperFunctions.m}{\lstinline{lookDiscretise}}, whether the $y$-axis points in the positive or negative look direction, and defined the look wave-number vector, $k_{l}$, accordingly.
+
+The calculation of the $\beta$ value proved troublesome. Remembering that $\beta$ is the ratio of slant range, $R$, and satellite velocity, $U$, the main issue with this calculation was obtaining an accurate satellite velocity. \acs{s1a} metadata provides orbit vector metadata in the form of the time, x-, y-, and z- position and velocity values. Calculating the satellite velocity, using the generic equation given in Equation \ref{eq:systemDesign.velocity}, from all orbit vectors seemed straightforward. However, it was found that calculating $U$ for each individual orbit vector, resulted in an increase in $U$ over time when the satellite's pass was ascending, and a decrease in $U$ over time when the satellite's pass was descending. 
+
+\begin{equation} \label{eq:systemDesign.velocity}
+    U = \sqrt{U_{x}^2 + U_{y}^2 + U_{z}^2}
+\end{equation}
+
+The difference between the maximum and minimum values of each individual orbit vector's velocity over Cape Point was found to be 4.6\,m/s. Further investigation revealed that at different latitudes and longitudes, this difference was minimised and amplified. [Discuss equator, and changes as moving more north or south and add plots]
 
 \subsection{\acfp{mtf}} \label{subsec:systemDesign.sarSpectrum.mtfs}
 
