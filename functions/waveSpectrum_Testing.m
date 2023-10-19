@@ -1,7 +1,14 @@
 %clear
 clc;
-
-filePath = downloadNOAAWaveFile('https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gdas.20231010/12/wave/gridded/gdaswave.t12z.gsouth.0p25.f000.grib2','wave_data.grib2');
+%% Determine wave file to download
+func = helperFunctions;
+captureDate = func.getCaptureDate(metadata);
+[noaaDateStr, noaaHourStr] = func.getNOAAParams(captureDate);
+noaaUrl = ['https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gdas.',noaaDateStr,'/',noaaHourStr,'/wave/gridded/gdaswave.t',noaaHourStr,'z.gsouth.0p25.f000.grib2'];
+%%
+% Hardcode as SAR data not available in window
+noaaUrl = 'https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gdas.20231010/12/wave/gridded/gdaswave.t12z.gsouth.0p25.f000.grib2';
+filePath = downloadNOAAWaveFile(noaaUrl,'wave_data.grib2');
 %% Real Deal
 % NOAA SOUTH IS NOT DOWNLOADING SOUTH - USE DOWNLOAD IN repo NOT functions
 % Can only have 1 .grib2 file in path
@@ -276,7 +283,7 @@ nValidation(k,70,5);
 % Contour of 2D wave spectrum
 %E = E(:,:,2);
 figure;
-contour(k_x_inv,k_y_inv,E_k)
+contour(k_x,k_y,E_k)
 grid on;
 yline(0);
 xline(0);

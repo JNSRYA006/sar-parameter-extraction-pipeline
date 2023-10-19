@@ -474,7 +474,7 @@ Both \acs{sar} and \ac{rar} systems consist of a radar sensor mounted on an airb
 The radar system operates by transmitting a series of chirps, each with a pulse length defined as $\tau_{p}$, which illuminate the region of the ground referred to as the antenna footprint \cite{Meyer2019}. To calculate the size of this footprint, consider the radar's slant range, $R$, which represents the distance between the antenna and its footprint, as well as the beamwidth, denoted as $\beta_{width}$. The beamwidth can be defined as the ratio between the radar's wavelength, $\lambda$, and the antenna length, $L_{ant}$. This definition enables the determination of the antenna footprint size, $S$ \cite{Meyer2019}
 
 \begin{equation} \label{eq:rar.footprintSize}
-    S \approx \frac{\lambda}{L_{ant}}R = \beta R \,\, \text{[m]}
+    S \approx \frac{\lambda}{L_{ant}}R = \beta_{width} R \,\, \text{[m]}
 \end{equation}
 
 This footprint is shown in dark grey in Figure \ref{fig:theory.slarGeometry} as well as depicting the incidence angle, $\theta_{i}$, which can be derived as $90 \degree - \theta_{l}$. The resolution of this beamwidth in both the down-range and cross-range directions can be empirically determined. The slant range resolution of a \ac{slar} system is defined in terms of the speed of light, $c$ and the pulse length, $\tau_{p}$ as
@@ -866,7 +866,7 @@ where $\Delta P^n(\underline{k})$  is defined as
 \begin{equation} \label{eq:hh.inversion.deltaPn}
     \Delta P^n(\underline{k}) = \frac{1}{2} \text{exp} \left [ -k^2_x {\xi}'^2_n \right ] \left ( \left | T^S_k \right |^2 \Delta E^n(\underline{k}) + \left | T^S_{-k} \right |^2 \Delta E^n(-\underline{k}) \right )
 \end{equation}
-where $\xi'$ is defined as the azimuthal displacement. $\xi' = \beta \left \langle v \right \rangle$. $\left \langle v \right \rangle$ is defined as the time average over the period of viewing the scene. $\xi'$ can also be determined using the following equation \cite{Hasselmann1991,Wadhams2002}
+where $\xi'$ is defined as the azimuthal displacement. $\xi' = \beta \left \langle v \right \rangle$. $\left \langle v \right \rangle$ is defined as the time average over the period of viewing the scene. $\xi'^2$ can also be determined using the following equation \cite{Hasselmann1991,Wadhams2002}
 
 \begin{equation} \label{eq:hh.inversion.xi}
     \xi'^{2} = \beta ^{2} \int \left | T^{v}_k \right | ^2 E(\underline{k}) d\underline{k}
