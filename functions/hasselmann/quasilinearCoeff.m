@@ -2,7 +2,7 @@ function [p_s_ql,beta,xi_sqr] = quasilinearCoeff(k,k_y,k_x,waveSpectrum,SARmetad
 
 func = helperFunctions;
 
-[beta] = getBeta(SARmetadata,245,16,'max');
+beta = func.getBeta(SARmetadata);
 look = func.getLook(SARmetadata);
 
 look = func.look(look);

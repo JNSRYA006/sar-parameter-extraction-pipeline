@@ -135,14 +135,15 @@ polarisation = func.getPolarisation(metadata);
 k_new = k;
 %k_y = func.resize(k_y,th(1,:));
 k_l = func.kl(look,k_y);
+k_l_inv = func.kl(look,k_y_inv);
 omega = func.omega(k_new);
 
 Th_k = func.hydroMTF(omega,mu_Th,k_new,k_y);
 Tt_k = func.tiltMTF(polarisation,k_l,th);
 TR_k = func.rarMTF(Tt_k,Th_k);
 
-Th_k_inv = func.hydroMTF(omega,mu_Th,-k_new,k_y);
-Tt_k_inv = func.tiltMTF(polarisation,k_l,th);
+Th_k_inv = func.hydroMTF(omega,mu_Th,k_inv,k_y_inv);
+Tt_k_inv = func.tiltMTF(polarisation,k_l_inv,th);
 TR_k_inv = func.rarMTF(Tt_k_inv,Th_k_inv);
 
 HRK = exp(-k_x.*xi_sqr).*TR_k;
@@ -233,8 +234,8 @@ title('Image Variance Spectrum')
 
 %% Get SAR intensity power spectrum
 % Calculate the 2D Fourier transform of the intensity data
-intensityFFT = abs(fftshift(fft2(transectData_nc(:,:,3))));
-
+intensityFFT = abs(fftshift(fft2(VV_nc)));
+%%
 % Plot the power spectrum
 dk_x = 0.005890997229533;
 dk_y = -0.005226593472072;

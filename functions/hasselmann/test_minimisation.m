@@ -14,14 +14,14 @@ E_k = func.resize(E_k(2:end,2:end),P_s_lin);
 E_k_inv = func.resize(E_k_inv(2:end,2:end),E_k);
 Ts_k = func.resize(Ts_k(:,2:end),E_k);
 Ts_k_inv = func.resize(Ts_k_inv(:,2:end),E_k);
-p_s_coeff_inv = quasilinearCoeff(k_inv,k_y,k_x,E_k_inv,metadata,th);
+p_s_coeff_inv = quasilinearCoeff(k_inv,k_y_inv,k_x_inv,E_k_inv,metadata,incidenceAngle);
 
 for j=1:numOfIterations
 numOfIterations = iterations(j);
 %numOfIterations = 8;
-[J,deltaEn,En] = costFunctionCalculation(P_s,VV_nc,E_k,E_k_inv,B,mu,Ts_k,Ts_k_inv,P_s_lin,p_s_coeff,p_s_coeff_inv,numOfIterations,dk_x,dk_y);
+[J,deltaEn,En] = costFunctionCalculation(P_s_pipeline,intensityFFT,E_k,E_k_inv,B,mu,Ts_k,Ts_k_inv,P_s_lin,p_s_coeff,p_s_coeff_inv,numOfIterations,dk_x,dk_y);
+Pn = generateSARSpectrumOceanWaves(k,k_y,k_x,En,metadata,incidenceAngle,r,1,w);
 En = abs(En);
-Pn = p_s_coeff.*En;
 
 deltaEn = func.resize(deltaEn(2:end,2:end),E_k);
 En = func.resize(En(2:end,2:end),E_k);
@@ -65,18 +65,27 @@ end
 %% Plot minimisation
 figure;
 plot(iterations,sigWavePeriod);
-
 %% Plot output wave spectra
 
 [t,r] = meshgrid(theta,w);
 [x,y] = pol2cart(t,r);
 
 figure;
-surf(x,y,En_w_th,'LineStyle','none');
-%contour(x,y,En_w_th);
+%surf(x,y,En_w_th,'LineStyle','none');
+contour(x,y,En_w_th);
 %title(['Number of iterations: ',num2str(numOfIterations)]);
-%yline(0);
-%xline(0);
+yline(0);
+xline(0);
+grid on;
+xlabel('\omega (rad/s)'), ylabel('\omega (rad/s)');
+%%
+EDiff = abs(En_w_th - E);
+figure;
+surf(x,y,EDiff,'LineStyle','none');
+%contour(x,y,EDiff);
+%title(['Number of iterations: ',num2str(numOfIterations)]);
+yline(0);
+xline(0);
 grid on;
 xlabel('\omega (rad/s)'), ylabel('\omega (rad/s)');
 %%
@@ -88,13 +97,43 @@ grid on;
 yline(0);
 xline(0);
 xlabel('$k_{x}$','interpreter','latex'), ylabel('$k_{y}$','interpreter','latex');
+%%
+EDiff_k = abs(En - E_k);
+figure;
+%surf(k_x,k_y,EDiff_k,'LineStyle','none')
+contour(k_x,k_y,EDiff_k);
+% hold on;
+% contour(k_x,k_y,E_k);
+% contour(k_x,k_y,En);
+% hold off;
+%title(['Number of iterations: ',num2str(numOfIterations)]);
+grid on;
+yline(0);
+xline(0);
+xlabel('$k_{x}$','interpreter','latex'), ylabel('$k_{y}$','interpreter','latex');
+%% Plot output SAR spectra
+figure;
+surf(k_x,k_y,20*log10(abs(Pn)),'LineStyle','none')
+%contour(k_x,k_y,20*log10(abs(Pn)));
+%title(['Number of iterations: ',num2str(numOfIterations)]);
+grid on;
+yline(0);
+xline(0);
+xlabel('$k_{x}$','interpreter','latex'), ylabel('$k_{y}$','interpreter','latex');
 %% Plot 1D spectrum
 figure;
 plot(w,En_w);
-
+%% Plot 1D difference
+E1DDiff = abs(En_w - S(:,:,1));
+figure;
+plot(w,E1DDiff);
+hold on;
+plot(w,En_w);
+plot(w,S(:,:,1))
+hold off;
 %% Plot J
 figure;
-plot(iterations,J)
+plot(iterations,abs(J))
 
 
 function [J,deltaFn,Fn] = costFunctionCalculation(generatedSARSpectrum,observedSARSpectrum,firstGuessWaveSpectrum,inverseFirstGuessWaveSpectrum,B,mu,Ts_k,Ts_k_inv,imageVarianceSpectrum,quasilinearCoeff,invQuasilinearCoeff,numOfIterations,dk_x,dk_y)
@@ -118,7 +157,7 @@ for i=1:numOfIterations
     Bk = Wk.*Wnk;
     deltaFn = (Ank.*(Wk.*deltaPk + mu.*deltaFk) - Bk.*(Wnk.*deltaPk + mu.*deltaFnk))./(Ak.*Ank - Bk.^2);
     deltaPn = 0.5.*quasilinearCoeff.*imageVarianceSpectrum;
-    J(i) = trapz(trapz((deltaPn-(observedSARSpectrum-Pn)).^2).*dk_x).*dk_y + mu.*trapz(trapz((deltaFn-(firstGuessWaveSpectrum-Fn)).^2).*dk_x).*dk_y;
+    J(i) = trapz(trapz((deltaPn-deltaPk).^2).*dk_x).*dk_y + mu.*trapz(trapz((deltaFn-deltaFk).^2).*dk_x).*dk_y;
 end
 
 end
