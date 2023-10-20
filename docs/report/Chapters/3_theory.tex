@@ -3,7 +3,7 @@
 %****************************************************
 \chapter{Theoretical Background}
 \label{chap:theory}
-In order to understand the \ac{hh} inversion technique, the theoretical foundations surrounding the modelling of ocean waves, in both deep and shallow water, need to be understood. Furthermore, a foundational understanding of \ac{sar}, encompassing its data acquisition and types, along with the pre-processing techniques applied in implementing the \ac{hh} technique to achieve the desired outcomes, is necessary.
+In order to understand the \ac{hh} inversion technique, the theoretical foundations surrounding the modelling of ocean waves, in both deep and shallow water, need to be understood. Furthermore, a foundational understanding of \ac{sar}, encompassing its data acquisition and types, along with the pre-processing techniques applied in implementing the \ac{hh} technique, is necessary.
 
 This chapter's objective is to introduce the theoretical aspects surrounding these fields, thereby providing context for the subsequent chapter's introduction of the pipeline design. Additionally, this chapter builds upon the theories previously discussed in Chapter \ref{chap:litReview}. In this chapter, key terms are useful to enhance the understanding of the reader. Field-specific terms are briefly introduced in the \nameref{chap:glossary} and provide context to the terms used in the subsequent sections.
 
@@ -11,18 +11,11 @@ This chapter's objective is to introduce the theoretical aspects surrounding the
 % OCEAN WAVES
 %====================================================
 \section{Ocean Waves} \label{sec:theory.waves}
-The majority of this section draws upon content collated by Holthuijsen \cite{Holthuijsen2007}, with equations and figures cited appropriately. The objective of this section is to provide an introductory overview of the fundamental theory related to ocean waves and their mathematical modelling as well as highlighting the differences in this modelling in deep and shallow water. Appropriate, and relevant derivations and visual explanations of key concepts are included in Appendix \ref{ap:oceanWaves}. %Furthermore, the way in which waves are attenuated and dispersed upon entering the \ac{miz} in Antarctica is discussed.
+The majority of this section draws upon content collated by Holthuijsen \cite{Holthuijsen2007}, with equations and figures cited appropriately. The objective of this section is to provide an introductory overview of the fundamental theory related to ocean waves and their mathematical modelling as well as highlighting the differences in modelling deep and shallow water. %Appropriate, and relevant derivations and visual explanations of key concepts are included in Appendix \ref{ap:oceanWaves}. %Furthermore, the way in which waves are attenuated and dispersed upon entering the \ac{miz} in Antarctica is discussed.
 
 \subsection{Description of Ocean Waves} \label{subsec:theory.waves.description}
 
 The wave height, $H$, can be defined as the vertical distance between the lowest and highest surface elevation in a wave. Where surface elevation, denoted using $\eta(t)$, refers to the instantaneous elevation of the sea surface relative to some reference level. The zero-crossing wave period, $T_{0}$, can be defined as the time between one zero-down crossing and the following one. Where a zero-down crossing is the crossing of the mean surface elevation when the gradient of the wave is negative. All of these terms are depicted in Figure \ref{fig:theory.waves.introFigure}.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=.8\linewidth]{Figures/Theory/placeholder_waveDefinitions.png}
-    \caption{Visual definition of surface elevation ($\eta(t)$), wave height ($H$), wave period ($T$), and zero-down crossing. Adapted from \cite{Holthuijsen2007}.}
-    \label{fig:theory.waves.introFigure}
-\end{figure}
 
 Holthuijsen \cite{Holthuijsen2007} defines the following equations for the mean wave height and zero-crossing wave period for $N$ wave where $i$ represents the sequence number of the waves in the \gls{waveRecord}.
 
@@ -33,6 +26,13 @@ Holthuijsen \cite{Holthuijsen2007} defines the following equations for the mean 
 \begin{equation} \label{eq:waves.mean(T0)}
     \overline{T_{0}} = \frac{1}{N}\sum_{i}^{N}T_{0,i}
 \end{equation}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=.75\linewidth]{Figures/Theory/surfaceElevation.pdf}
+    \caption{Visual definition of surface elevation ($\eta(t)$), wave height ($H$), wave period ($T$), and zero-down crossing. Adapted from \cite{Holthuijsen2007}.}
+    \label{fig:theory.waves.introFigure}
+\end{figure}
 
 The definition of the significant wave height and wave period follows, where $j$ is the rank number of the sequence of waves, based on wave height, in descending order. The significant wave height is a useful metric, as it can be estimated from the wave spectrum \cite{Holthuijsen2007}, which is introduced in the subsequent subsection.
 
@@ -45,44 +45,38 @@ The definition of the significant wave height and wave period follows, where $j$
 \end{equation}
 
 \subsection{Wave Spectra} \label{subsec:theory.waves.waveSpectrum}
-Include info about stationary measurements
+
+The aim of representing ocean waves as a spectrum is to define the sea state as a stochastic process encompassing all feasible time record observations, based on current sea state conditions. The most important form in which ocean waves are described is the random phase/amplitude model, which forms the basis of the wave spectrum \cite{Holthuijsen2007}.
+
 \subsubsection{Random Phase/Amplitude Model} \label{subsec:theory.waves.waveSpectrum.randModel}
 
-The wave spectrum aims to describe the ocean surface as a stationary stochastic process\footnote{define stochastic process}. It is based on the random-phase/amplitude model, where the surface elevation is treated as the sum of a large number of harmonic waves. Each of these waves possesses a constant amplitude and a phase that is randomly selected for each time record realisation. This approach enables the modelling of the wave spectrum as a Fourier series, as illustrated in Equation \ref{eq:waveSpectrum.fourierSeries}. For a more detailed explanation, please refer to Appendix \ref{sec:ap.oceanWaves.randModel}.
+The wave spectrum aims to describe the ocean surface as a stationary stochastic process\footnote{A stochastic process represents a collection of random variables indexed by a different variable, such as time, and is classified as stationary if its statistical characteristics remain constant over this index variable, ie., time.} \cite{Holthuijsen2007}. It is based on the random-phase/amplitude model, where the surface elevation is treated as the sum of a large number of harmonic waves. Each of these waves possesses a constant amplitude and a phase that is randomly selected for each time record realisation. This approach enables the modelling of the wave spectrum as a Fourier series, as illustrated in Equation \ref{eq:waveSpectrum.fourierSeries} \cite{Holthuijsen2007}. For a more detailed explanation, please refer to \cite{Holthuijsen2007}.
 
 \begin{equation} \label{eq:waveSpectrum.fourierSeries}
     \underline{\eta}(t) = \sum_{i=1}^{N}\underline{a}_{i}cos(2\pi f_{i}t + \underline{\phi}_{i})
 \end{equation}
 
-ADD NOTES ON APPLICABILITY OF RANDOM MODEL (pg. 35 - beginning 36)
+The random phase/amplitude model has two key considerations related to its applicability. Firstly, the model aims to generate a stationary stochastic sea state, even though real sea conditions are never truly stationary. This is achieved by dividing up the larger record into intervals, typically lasting 15-30 minutes, which is a common practice in sea state data collection \cite{Holthuijsen2007}. Secondly, the model represents a discrete sum of frequencies, whereas, in reality, continuous frequencies exist at sea \cite{Holthuijsen2007}. In order to mitigate this second consideration, the continuous variance density spectrum is defined.
+
 
 \subsubsection{Variance Density Spectrum} \label{subsec:theory.waves.waveSpectrum.varianceSpectrum}
 
-The variance density spectrum can be constructed by utilising the variance, $E\left \{  \frac{1}{2}\underline{a}^{2}_{i}\right \}$, as opposed to the expected value, $E\left \{  \underline{a}_{i}\right \}$. [Use note 3A to explain variance] Also explain why variance is better than using expected value [variance is chosen as it allows the change over different samples to be seen, as opposed to the pure magnitude.]
-% This choice to use variance is preferred as it allows changes across different samples to be observed, rather than each sample's pure magnitude.
+The variance spectrum can be constructed by utilising the variance\footnote{The variance of $\eta(t)$, is the average of the time-averaged squared surface elevation, $\overline{\eta^2} = \frac{1}{2}a^2$ \cite{Holthuijsen2007}.}, $E\left \{  \frac{1}{2}\underline{a}^{2}_{i}\right \}$, as opposed to the expected value, $E\left \{  \underline{a}_{i}\right \}$. Variance is preferred as it allows the change across different samples to be observed, as opposed to each sample's pure magnitude.
 
-In order to mitigate the second issue with the application of the random phase/amplitude model, it is modified by distributing the variance over the frequency interval $\Delta f_{i}$ and the frequency $f_{i}$. This gives rise to the variance \textbf{density} spectrum, $E^{*}\left \{ \frac{1}{2}  \underline{a}^{2}_{i}\right \}$.
+In order to mitigate the second issue with the application of the random phase/amplitude model, it is modified by distributing the variance over the frequency interval $\Delta f_{i}$ and the frequency $f_{i}$ \cite{Holthuijsen2007}. This gives rise to the variance \textbf{density} spectrum, $E^{*}\left \{ \frac{1}{2}  \underline{a}^{2}_{i}\right \}$.
 
 
 \begin{equation} \label{eq:waveSpectrum.varianceDSpectrum}
     E^{*}\left \{  f_{i}\right \} = \frac{1}{\Delta f_{i}}E\left \{\frac{1}{2}  \underline{a}^{2}_{i}\right \} \; \; \; \text{for all} \; \; \;  f_{i}
 \end{equation}
 
-Whilst Equation \ref{eq:waveSpectrum.varianceDSpectrum} is defined for all frequencies, it is still discontinuous between frequency bands. A continuous version of $E^{*}\left \{  f_{i}\right \}$ can be determined by taking the limit as $\Delta f_{i}$ tends to zero. This entire process is graphically depicted in Figure \ref{fig:theory.waves.waveSpectrum.varianceDSpectrum}.
+Whilst Equation \ref{eq:waveSpectrum.varianceDSpectrum} is defined for all frequencies, it is still discontinuous between frequency bands \cite{Holthuijsen2007}. A continuous version of $E^{*}\left \{  f_{i}\right \}$ can be determined by taking the limit as $\Delta f_{i}$ tends to zero.
 
 \begin{equation} \label{eq:waveSpectrum.varianceDSpectrumCont}
     E(f) = \lim_{\Delta f \to 0}\frac{1}{\Delta f}E\left \{ \frac{1}{2} \underline{a}^{2}\right \}
 \end{equation}
-[Show graphically with FIG 3.7 - pg. 37]
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=.5\linewidth]{Figures/LiteratureReview/Satellites/sentinelCoverage.jpg}
-    \caption{Visual explanation of the transformation from discrete amplitude spectrum of the random phase/amplitude model (top frame), depicted in Figure \ref{fig:ap.randModel}, to the continuous variance density spectrum (bottom frame). Adapted from \cite{Holthuijsen2007}.}
-    \label{fig:theory.waves.waveSpectrum.varianceDSpectrum}
-\end{figure}
-
-The variance density spectrum provides a complete description of the surface elevation of ocean waves as all statistical characteristics of the wave field can be expressed in terms of this spectrum, provided it is modelled as a stationary, Gaussian process.
+The variance density spectrum provides a complete description of the surface elevation of ocean waves as all statistical characteristics of the wave field can be expressed in terms of this spectrum \cite{Holthuijsen2007}, provided it is modelled as a stationary, Gaussian process.
 
 % The units of the variance density spectrum, $E(f)$, can be derived as follows.
 % \begin{gather*}
@@ -104,23 +98,19 @@ Equations \ref{eq:waveSpectrum.fourierSeries},\ref{eq:waveSpectrum.varianceDSpec
     \underline{\eta}(t) = \sum_{i=1}^{N}\underline{a}_{i}cos(\omega t + \underline{\phi}_{i})
 \end{equation}
 
-This allows the variance density spectrum, $E(\omega)$, to be defined as follows, where $J$ represents the Jacobian. In this case, $J=1/2\pi$.
+This allows the variance density spectrum, $E(\omega)$, to be defined as follows, where $J$ represents the Jacobian. In this case, $J=1/2\pi$ \cite{Holthuijsen2007}.
 \begin{equation} \label{eq:waveSpectrum.relateE(f)toE(w)}
     E(\omega) =  E(f) \frac{df}{d\omega} = E(f)J = \frac{1}{2\pi}E(f)
 \end{equation}
 
 \subsubsection{Frequency-direction Spectrum} \label{subsec:theory.waves.waveSpectrum.freqDirection}
-The variance density spectrum equation as described in Equation \ref{eq:waveSpectrum.varianceDSpectrumCont} represents a one-dimensional function of time. In order to consider a two-dimensional spectrum, the random phase/amplitude model needs to be expanded to consider a wave propagating in the $x,y$-space in a direction $\theta$, relative to the +$x$-axis. This allows the model to be expanded as follows, where the wave number, $k = 2\pi/L$ with $L$ equal to the length of the harmonic wave.
+The variance density spectrum equation as described in Equation \ref{eq:waveSpectrum.varianceDSpectrumCont} represents a one-dimensional function of time. In order to consider a two-dimensional spectrum, the random phase/amplitude model needs to be expanded to consider a wave propagating in the $x,y$-space in a direction $\theta$, relative to the +$x$-axis. This allows the model to be expanded as follows, where the wave number, $k = 2\pi/L$ \cite{Holthuijsen2007} with $L$ equal to the length of the harmonic wave.
 
 \begin{equation} \label{eq:waveSpectrum.fourierSeries_3D}
     \underline{\eta}(x,y,t) = \sum_{i=1}^{N} \sum_{j=1}^{M} \underline{a}_{i,j}cos(\omega_{i}t-k_{i}xcos(\theta_{j}) - k_{i}ysin(\theta_{j}) + \underline{\phi}_{i,j})
 \end{equation}
 
-where each wave component is indicated by two indices.
-\begin{itemize}
-    \item $i$: The frequency index or wave number
-    \item $j$: The direction
-\end{itemize}
+where each wave component is indicated by two indices. Where $i$ represents the frequency index or wave number and $j$ represents the wave direction.
 
 Following the same process of transforming a one-dimensional amplitude spectrum into a continuous variance density spectrum, as detailed in Equations \ref{eq:waveSpectrum.varianceDSpectrum}, \ref{eq:waveSpectrum.varianceDSpectrumCont}, the two-dimensional variance density spectrum is found as
 
@@ -151,7 +141,7 @@ Where the wave spectrum considers the sea as a function of space and time, $\eta
 % \end{equation}
 
 \subsubsection{Two-dimensional spectrum} \label{subsec:theory.waves.waveNumberSpectra.2D}
-In order to define the two-dimensional wave-number spectrum, the method described in Equations \ref{eq:waveSpectrum.fourierSeries}, \ref{eq:waveSpectrum.varianceDSpectrumCont} can be used. Where $\Delta k_{x}$ and $\Delta k_{y}$ represent the spectral bandwidths.
+In order to define the two-dimensional wave-number spectrum, the method described in Equations \ref{eq:waveSpectrum.fourierSeries}, \ref{eq:waveSpectrum.varianceDSpectrumCont} can be used. Where $\Delta k_{x}$ and $\Delta k_{y}$ represent the spectral bandwidths \cite{Holthuijsen2007}.
 
 \begin{equation} \label{eq:waveNumberSpectrum.fourierSeries_2D}
     \eta(x,y) = a_{i,j}cos(k_{x,i}x + k_{y,j}y + \phi_{i,j})
@@ -167,21 +157,17 @@ With $k_{x} = k\cos(\theta)$, and $k_{y} = k\sin(\theta)$, $k$ and $\theta$ can 
     E(k,\theta) = \lim_{\Delta k \to 0} \lim_{\Delta \theta \to 0} \frac{1}{\Delta k \Delta \theta} E\left \{ \frac{1}{2} \underline{a}^{2}\right \}
 \end{equation}
 
-These two spectra are related by the following relationship.
+These two spectra are related by the following relationship \cite{Holthuijsen2007}.
 \begin{equation} \label{eq:waveNumberSpectrum.relateE(k,th)toE(kx,ky)_2D}
     E(k,\theta) =  E(k_{x},k_{y}) J = k E(k_{x},k_{y})
 \end{equation}
 
-The two-dimensional frequency-direction spectrum in Equation \ref{eq:waveSpectrum.varianceDSpectrumCont_2D} is related to the spectrum in Equation \ref{eq:waveNumberSpectrum.SpectrumCont_2D} by the following relationship, where $c_{w} = \omega /k$ and the Jacobian, $J = 1/c_{g}$. $c_{w}$ and $c_{g}$ are defined as the wave speed and group wave speed respectively and are discussed in the following subsection.
+The two-dimensional frequency-direction spectrum in Equation \ref{eq:waveSpectrum.varianceDSpectrumCont_2D} is related to the spectrum in Equation \ref{eq:waveNumberSpectrum.SpectrumCont_2D} by the following relationship, where $c_{w} = \omega /k$ and the Jacobian, $J = 1/c_{g}$ \cite{Holthuijsen2007}. $c_{w}$ and $c_{g}$ are defined as the wave speed and group wave speed respectively and are discussed in the following subsection.
 \begin{equation} \label{eq:waveNumberSpectrum.relateE(kx,ky)toE(w,th)_2D}
     E(k_{x},k_{y}) =  k E(\omega,\theta) J = \frac{c_{w} c_{g}}{\omega} E(\omega,\theta)
 \end{equation}
 
-These two-dimensional spectra are useful in two different applications, however, in varying forms.
-\begin{itemize}
-    \item Remote sensing: $E(k_{x},k_{y})$
-    \item Wave models: $E(f,\theta)$
-\end{itemize}
+These two-dimensional spectra are useful in two different applications, however, in varying forms. The wave-number spectrum, $E(k_{x},k_{y})$ is useful for remote sensing applications, and the frequency-direction spectrum, $E(f,\theta)$, is used for wave models \cite{Holthuijsen2007}.
 
 \subsection{Linear Wave Theory} \label{subsec:theory.waves.linearWaveTheory}
 
@@ -193,13 +179,6 @@ The linear theory for \gls{oceanWaves} provides a detailed description of harmon
     \eta(x,t) = \frac{H}{2}\text{sin} \left ( \frac{2\pi}{T}t - \frac{2\pi}{L}x \right )
   \end{align}
 \end{subequations} 
-
-
-\begin{itemize}
-    \item Illustration on page 119
-\end{itemize}
-
-% Include derivation of c_wave - page 119
 
 \subsection{Ocean Wave Dynamics} \label{subsec:theory.waves.dynamics}
 
@@ -249,9 +228,9 @@ The same logic with respect to $kd \to 0$ applies to the phase velocity and mean
     c_{w_{shallow}} = \sqrt{gd}
 \end{equation}
 
-Equation \ref{eq:linearWaveTheory.phaseVelocity.shallowWater} shows that the phase speed does not depend on wavelength or frequency, and as such, this means that the waves are non-dispersive\footnote{non-dispersive defn.}.
+Equation \ref{eq:linearWaveTheory.phaseVelocity.shallowWater} shows that the phase speed does not depend on wavelength or frequency, and as such, this means that the waves are non-dispersive\footnote{Ocean waves are defined as non-dispersive if the phase speed of the wave does not depend on wave number, wavelength or frequency \cite{Holthuijsen2007}.}.
 
-\subsubsection{Adding Two Harmonic Waves} \label{subsec:theory.waves.linearWaveTheory.twoHarmonicWaves}
+\subsubsection{Wave Groups} \label{subsec:theory.waves.linearWaveTheory.twoHarmonicWaves}
 
 Using the definition of a propagating harmonic wave in Equation \ref{eq:linearWaveTheory.propHarmonicWave}, two of these waves can be combined in the following form.
 
@@ -261,7 +240,6 @@ Using the definition of a propagating harmonic wave in Equation \ref{eq:linearWa
 
 These two waves combine to create a sequence of wave groups. This group reaches its peak surface elevation when both $\eta_{1}$ and $\eta_{2}$ are in phase with each other. The phase velocity of these waves can be defined as the phase speed of the surface elevation envelope. This envelope can be determined by re-arranging Equation \ref{eq:addingTwoWaves} to give
 
-% Fix with \left and \right
 \begin{equation} \label{eq:addingTwoWaves.envelopeForm}
     \eta =  2a\text{cos} \left ( \frac{\omega_{1} - \omega_{2}}{2}t - \frac{k_{1} - k_{2}}{2}x \right ) \text{sin} \left ( \frac{\omega_{1} + \omega_{2}}{2}t - \frac{k_{1} + k_{2}}{2}x  \right )
 \end{equation}
@@ -278,7 +256,7 @@ As the frequencies and wave numbers can be considered as continuous, Equation \r
     c_{g} = \frac{\partial \omega}{\partial k} = nc_{w}
 \end{equation}
 
-where $n$ is derived from Equation \ref{eq:linearWaveTheory.dispersionRelationship} as 
+where $n$ is derived from Equation \ref{eq:linearWaveTheory.dispersionRelationship} \cite{Holthuijsen2007} as 
 
 \begin{equation} \label{eq:addingTwoWaves.n}
     n = \frac{1}{2} \left ( 1+ \frac{2kd}{\text{sinh}(2kd)} \right )
@@ -320,25 +298,29 @@ $\gamma$ is the peak enhancement factor and is determined experimentally for the
     \end{cases}       
 \end{equation*}
 
-$\alpha$ is called the energy scale parameter and is calculated using the significant wave height and peak frequency
+$\alpha$ is called the energy scale parameter and is calculated using the significant wave height and peak frequency. Equations \ref{eq:piersonMoskowitz}, \ref{eq:jonswap.peakEnhancementFactor}, \ref{eq:jonswap.itoPiersonMoskowitz} are represented visually in Figure \ref{fig:theory.JONSWAPFromPM}.
 
 \begin{equation} \label{eq:jonswap.alpha}
     \alpha = 0.2 \frac{H_{1/3}^2 f_{peak}^{4}}{g^{2}}
 \end{equation}
 
-\begin{itemize}
-    \item Show adapted Figure 6.6 (page 161)
-\end{itemize}
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=.95\linewidth]{Figures/Theory/JONSWAPFromPM.pdf}
+    \caption{Graphical representation of Equations \ref{eq:piersonMoskowitz}, \ref{eq:jonswap.peakEnhancementFactor}, \ref{eq:jonswap.itoPiersonMoskowitz} which represent the Pierson-Moskowitz spectrum, peak enhancement function and the resultant \acs{jonswap} spectrum respectively. Adapted from \cite{Holthuijsen2007}.}
+    \label{fig:theory.JONSWAPFromPM}
+\end{figure}
+
 
 \subsubsection{Two-dimensional Wave Spectrum} \label{subsubsec:theory.waves.modelling.2D}
 
-To extend one-dimensional wave models generated using the \acs{jonswap} spectrum to two dimensions, the introduction of a directional distribution function is required. This directional distribution function represents the cross-section of the two-dimensional spectrum at a specific frequency and is normalised so that the integral of the function over its distribution equals one \cite{Holthuijsen2007}. It is a function of both $\theta$ and frequency but is often simply denoted as $D(\theta)$. The directional distribution employs a $\cos^{2}\theta$ model \cite{Holthuijsen2007} and takes the form
+To extend one-dimensional wave models generated using the \acs{jonswap} spectrum to two dimensions, the introduction of a directional distribution function is required. This directional distribution function represents the cross-section of the two-dimensional spectrum at a specific frequency and is normalised so that the integral of the function over its distribution equals one \cite{Holthuijsen2007}. It is a function of both $\theta$ and frequency but is often denoted as $D(\theta)$. The directional distribution employs a $\cos^{2}\theta$ model \cite{Holthuijsen2007} and takes the form
 
 \begin{equation} \label{eq:directionalDistributionFunc}
     D(\theta) = A_{2} \cos^{2s} \left ( \frac{1}{2} (\theta_{wave} - \theta_{wind}) \right )
 \end{equation}
 
-where $A_{2}$ is determined using the gamma function\footnote{Gamma function definition}, $\Gamma(\cdot)$, and $s$ controls the distribution's width. 
+where $A_{2}$ is determined using the gamma function\footnote{The gamma function, $\Gamma(\cdot)$, is an extension of the general factorial function, but allows both complex and real numbers. $\Gamma(z) = \int_{0}^{\infty}t^{z-1}e^{-t}dt$.}, $\Gamma(\cdot)$, and $s$ controls the distribution's width. 
 
 \begin{equation} \label{eq:directionalDistributionFunc.A2}
     A_{2} = \frac{\Gamma(s+1)}{\Gamma \left ( s + \frac{1}{2} \right )2\sqrt{\pi}}
@@ -439,22 +421,22 @@ A reasonable approximation for $\sigma_{\theta}$ is given by
 % SAR
 %====================================================
 \section{\acf{sar}} \label{sec:theory.sar}
-\begin{itemize}
-    \item transmission and reception (backscatter ecos) of EM signals (Speak about platform movement)
-    \item Combining received signals allows a longer virtual aperture than the physical antenna length
-    \item Freq. modulated pulsed waveforms (Chirps). Explain with figure (pg. 9 Tutorial on SAR)
-    \item Fast and slow time
-    \item SAR geometry (Nadir, slant range, down-range, cross-range, swath, ground range etc) [Show with figure]
-    \item Parabolic behaviour and path
-    \item Resolution in both directions (With comparison to RAR)
-    \item Figure 3 in Tutorial for raw -> image
-    \item The intensity of each pixel indicates the reflectivity of the corresponding point on the ground
-    \item SPECKLE
-\end{itemize}
+% \begin{itemize}
+%     \item transmission and reception (backscatter ecos) of EM signals (Speak about platform movement)
+%     \item Combining received signals allows a longer virtual aperture than the physical antenna length
+%     \item Freq. modulated pulsed waveforms (Chirps). Explain with figure (pg. 9 Tutorial on SAR)
+%     \item Fast and slow time
+%     \item SAR geometry (Nadir, slant range, down-range, cross-range, swath, ground range etc) [Show with figure]
+%     \item Parabolic behaviour and path
+%     \item Resolution in both directions (With comparison to RAR)
+%     \item Figure 3 in Tutorial for raw -> image
+%     \item The intensity of each pixel indicates the reflectivity of the corresponding point on the ground
+%     \item SPECKLE
+% \end{itemize}
 
-\acs{sar} is an active air- or space-borne sensor which transmits and receives \acs{em} radiation at a certain carrier frequency, $f_c$. \acs{sar} is a form of imaging radar\footnote{Explain why radar not acronym RADAR} and the principles are built upon general radar principles. 
+\acs{sar} is an active air- or space-borne sensor which transmits and receives \acs{em} radiation at a certain carrier frequency, $f_c$. \acs{sar} is a form of imaging radar and the principles are built upon general radar principles. 
 
-[show general radar geometry setup]
+%[show general radar geometry setup]
 
 %\subsection{Introduction} \label{subsec:theory.sar.params}
 
@@ -462,9 +444,9 @@ A reasonable approximation for $\sigma_{\theta}$ is given by
 % Maybe SLAR
 
 % Both \acs{sar} and \ac{rar} consist of a radar sensor mounted on an air- or space-borne platform which looks away from the nadir track\footnote{explain nadir track} by a look angle, $\theta_{l}$. This application of a radar sensor looking to the side in an airborne setting is known as \ac{slar}. A graphical representation of the geometry of a \acs{slar} system is shown in Figure \ref{fig:theory.slarGeometry}. This pointing of the sensor at an angle illuminates an area on the ground, known as the swath, which changes as the aircraft moves along its path. The radar system operates by transmitting a sequence of chirps with a pulse length defined as $\tau_{p}$, which illuminates the part of the ground known as the antenna footprint. The size of this footprint can be calculated by considering the radar's slant range, $R$ - the distance from the sensor to the footprint, and the beamwidth, $\beta_{width}$ - which can be defined as the ratio between the radar's wavelength, $\lambda$, and antenna length, $L_{ant}$. This allows the antenna footprint size to be calculated as
-Both \acs{sar} and \ac{rar} systems consist of a radar sensor mounted on an airborne or spaceborne platform, which is oriented away from the nadir track\footnote{Define nadir track.}. When a radar sensor is used in this manner and in an airborne context, it is referred to as \ac{slar}.  This orientation is determined by a look angle, denoted as $\theta_{l}$. Figure \ref{fig:theory.slarGeometry} provides a graphical representation of the geometry of a \acs{slar} system. This configuration, where the sensor points at an angle, results in the illumination of a specific area on the ground known as the swath. The size of this swath changes as the aircraft progresses along its flight path.
+Both \acs{sar} and \ac{rar} systems consist of a radar sensor mounted on an airborne or spaceborne platform, which is oriented away from the nadir\footnote{Nadir is defined as the location directly below the radar sensor on the Earth's surface. From this, the nadir track can be defined as the path directly below the airborne sensor's flight path.} track. When a radar sensor is used in this manner and in an airborne context, it is referred to as \ac{slar}.  This orientation is determined by a look angle, denoted as $\theta_{l}$. Figure \ref{fig:theory.slarGeometry} provides a graphical representation of the geometry of a \acs{slar} system. This configuration, where the sensor points at an angle, results in the illumination of a specific area on the ground known as the swath. The size of this swath changes as the aircraft progresses along its flight path.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=.95\linewidth]{Figures/Theory/slarGeometry.pdf}
     \caption{Graphical representation of a \acs{slar} system with important features labelled. Adapted from \cite{Moreira2013,Meyer2019}.}
@@ -541,7 +523,7 @@ Each \acs{sar} sensor can capture data in multiple modes with the most common mo
 %TOPS ref \cite{Huang2014}.
 
 
-\begin{figure} [H]
+\begin{figure} [htbp]
     \centering
     \begin{subfigure}{0.48\textwidth}
         \includegraphics[width=\textwidth]{Figures/Theory/stripmap.pdf}
@@ -600,7 +582,7 @@ Scan\acs{sar} mode provides improved spatial coverage compared to both \acs{sm} 
 
 Table \ref{tab:theory.s1aImagingParams} provides a comparison of the ground resolution of all \acs{s1a} imaging techniques for \acs{grd} data.
 
-\begin{table}[H]
+\begin{table}[htbp]
 \centering
 \begin{tabular}{|c|c|c|}
 \hline
@@ -630,7 +612,7 @@ Due to the fact that this project requires imaging ocean waves, fine-range resol
 
 Speckle, often noted for its "salt-and-pepper" appearance \cite{Meyer2019} in \acs{sar} images, results from the interference of multiple scatters within a resolution cell which leads to varying intensity values. Even when imaging a uniform surface, speckle exists due to phase variations amongst scatterers within the resolution cell, with brighter image regions exhibiting more intense speckle \cite{Moreira2013,Meyer2019}. Speckle is not an error in a \acs{sar} image, but a consequence of imaging with finite resolution. Higher resolution weakens the speckle effect as it reduces the number of scatterers within the resolution cell \cite{Meyer2019}. Unprocessed intensity VV \acs{grd} data is shown in Figure \ref{fig:theory.data.unprocessed} and speckle can be seen in both sub-scenes.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=0.85\textwidth]{Figures/Theory/unprocessedSARData.pdf}
     \caption{Unprocessed \acs{grd} \acs{s1a} data.}
@@ -650,7 +632,7 @@ Thermal noise significantly affects \acs{sar} image quality. It represents inher
 
 Removal of \acs{s1a} thermal noise results in improved image quality and can be visually seen in Figure \ref{fig:theory.data.thermalNoiseRemoval} when compared to Figure \ref{fig:theory.data.unprocessed}, particularly over land regions in the second sub-scene.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=0.85\textwidth]{Figures/Theory/thermalNoiseCalibratedSARData.pdf}
     \caption{\acs{grd} \acs{s1a} data with thermal noise removed using \acs{snap}.}
@@ -670,20 +652,20 @@ Radiometric calibration of \acs{s1a} \acs{grd} data can be visually seen in Figu
 % Radiometric calibration in SAR images is a vital process, and it primarily involves addressing the variations in \acs{rcs}, which quantifies the radar signal's strength reflected by distributed scatterers. Calibration ensures that pixel values in \acs{sar} images are not only qualitatively representative but also quantitatively aligned with the \acs{rcs} and backscatter coefficient, $\sigma_{0}$. Essentially, radiometric calibration rectifies the radiometric bias present in the raw \acs{sar} data, making it suitable for a wide array of quantitative applications. This calibration process includes adjustments for factors like scattering area, antenna gain pattern, and range spread loss, guaranteeing the accuracy and reliability of \acs{sar} data for applications such as target recognition and environmental monitoring.
 
 % Update calibrated image
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=0.85\textwidth]{Figures/Theory/radiometricCalibratedSARData.pdf}
     \caption{Radiometrically calibrated \acs{grd} \acs{s1a} data done using \acs{snap}.}
     \label{fig:theory.data.radiometric}
 \end{figure}
 
-\begin{itemize}
-    \item Mention geocoding and terrain rectification (Link why this is the case)
-    \item Speak about speckle (or link)
-    \item Thermal Noise Removal
-    \item Radiometric calibration
-    \item Show graphically what each technique does and how it changes the image (Maybe in the appendix)
-\end{itemize}
+% \begin{itemize}
+%     \item Mention geocoding and terrain rectification (Link why this is the case)
+%     \item Speak about speckle (or link)
+%     \item Thermal Noise Removal
+%     \item Radiometric calibration
+%     \item Show graphically what each technique does and how it changes the image (Maybe in the appendix)
+% \end{itemize}
 
 \subsection{Polarisation} \label{subsec:theory.sar.polarisation}
 
@@ -706,7 +688,7 @@ When the surface has a regular structure, such as waves with a specific waveleng
 
 
 
-\begin{figure} [H]
+\begin{figure} [htbp]
     \centering
     \begin{subfigure}{0.31\textwidth}
         \includegraphics[width=\textwidth]{Figures/Theory/smoothSurface.pdf}
@@ -730,18 +712,18 @@ When the surface has a regular structure, such as waves with a specific waveleng
 % Scatterers, surface roughness and penetration of wavelength (NEEED NEW TITLE)
 % Speckle - Page 918 of PoMR
 %   - Page 148 of Radar Imaging of Ocean Waves
-\begin{itemize}
-    \item Penetration of radar signals (Link to wavelength)
-    \item - In the context of this work (Ocean waves [bragg scattering of wind-generated ripple waves] and sea ice)
-    \item Surface roughness
-    \item Scattering types
-\end{itemize}
+% \begin{itemize}
+%     \item Penetration of radar signals (Link to wavelength)
+%     \item - In the context of this work (Ocean waves [bragg scattering of wind-generated ripple waves] and sea ice)
+%     \item Surface roughness
+%     \item Scattering types
+% \end{itemize}
 
-\begin{itemize}
-    \item Speak about different polarisations and why each is good at what it does (In wave, ocean and land context)
-    \item Visually show how each differs
-    \item Focus on VV and HH and why they are used for Hasselmann in the context of ocean waves
-\end{itemize}
+% \begin{itemize}
+%     \item Speak about different polarisations and why each is good at what it does (In wave, ocean and land context)
+%     \item Visually show how each differs
+%     \item Focus on VV and HH and why they are used for Hasselmann in the context of ocean waves
+% \end{itemize}
 
 %====================================================
 % SAR OCEAN WAVE INVERSION
@@ -849,7 +831,7 @@ The inversion requires the minimisation of a cost function \cite{Hasselmann1991}
 \begin{equation} \label{eq:hh.inversion.J}
     J_{cost} = \int \left [ P(\underline{k}) - \hat{P}(\underline{k}) \right ]^2 d\underline{k} + \mu \int \left [ \frac{ E(\underline{k}) - \hat{E}(\underline{k})}{B+\hat{E}(\underline{k})} \right ]^2d\underline{k}
 \end{equation}
-where $\mu$ represents the confidence between the observed \acs{sar} spectrum and $\hat{E}(\underline{k})$. $\mu$ is set to be $0.1\hat{P}_{max}^2$ and $B$ is set to $0.01\hat{E}_{max}$ \cite{Hasselmann1991}. 
+where $\mu$ represents the confidence between the observed \acs{sar} spectrum and $\hat{E}(\underline{k})$. $\mu$ is set to $0.1\hat{P}_{max}^2$ and $B$ is set to $0.01\hat{E}_{max}$ \cite{Hasselmann1991}. 
 
 The first estimate, $E^1(\underline{k}) = \hat{E}(\underline{k})$, where $E^n(\underline{k})$ and $P^n(\underline{k})$ represent the approximate solution after n iterations. This allows $E^{n+1}$ and $P^{n+1}$ to be defined as
 
