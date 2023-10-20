@@ -100,7 +100,7 @@ n=1;
         coeff = ((k_x.*beta).^m);
         if (m == 2*n)
             fprintf('P_(n,2n) used \n')
-            P_s = P_s + coeff.*p_s_2n;
+            P_s = P_s + coef.*p_s_2n;
         end
         if (m == 2*n-1)
             fprintf('P_(n,2n-1) used \n')

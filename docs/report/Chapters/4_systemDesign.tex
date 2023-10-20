@@ -508,6 +508,16 @@ Converting the two-dimensional wave spectrum generated in Section \ref{subsec:sy
 
 \section{\acs{sar} Spectrum of Ocean Waves} \label{sec:systemDesign.sarSpectrum}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.95\linewidth]{Figures/PipelineDesign/sarSpectrumOverall.pdf}
+    \caption{Block diagram depicting an expanded \acs{sar} spectrum generation sub-block of Figure \ref{fig:systemDesign.scope}.}
+    \label{fig:systemDesign.sarSpectrum.blockDiagram}
+\end{figure}
+
+
+
+
 \subsection{Additional Metadata Extraction} \label{subsec:systemDesign.sarSpectrum.metadata}
 
 The \acs{mtf}s described in Section \ref{subsec:theory.hasselmann.sarImaging} each required some form of metadata from \acs{s1a} \acs{sar} data in order to be calculated. These metadata values are tabulated in Table \ref{tab:additionalMetadata} along with additional functions that were developed in order to get the extracted metadata in the correct form for implementing the \acs{mtf} equations.
@@ -543,6 +553,33 @@ The difference between the maximum and minimum values of each individual orbit v
 \subsection{\acfp{mtf}} \label{subsec:systemDesign.sarSpectrum.mtfs}
 
 \subsection{Co and Autocovariance Functions} \label{subsec:systemDesign.sarSpectrum.coAutoFunc}
+
+\subsubsection{Orbital Velocity Covariance Function}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.95\linewidth]{Figures/PipelineDesign/orbitalVelocityCovariance.pdf}
+    \caption{Block diagram depicting an expanded \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/hasselmann/helperFunctions.m}{\lstinline{orbitalVelocityCovariance}} sub-block of Figure \ref{fig:systemDesign.sarSpectrum.blockDiagram}.}
+    \label{fig:systemDesign.sarSpectrum.blockDiagram.orbitalVelocity}
+\end{figure}
+
+\subsubsection{\acs{rar} Image Intensity Autocovariance Function}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.95\linewidth]{Figures/PipelineDesign/RARAutocovariance.pdf}
+    \caption{Block diagram depicting an expanded \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/hasselmann/helperFunctions.m}{\lstinline{rarImageIntensityAutocovariance}} sub-block of Figure \ref{fig:systemDesign.sarSpectrum.blockDiagram}.}
+    \label{fig:systemDesign.sarSpectrum.blockDiagram.rarAutoco}
+\end{figure}
+
+\subsubsection{\acs{rar} Image Intensity Covariance Function}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.95\linewidth]{Figures/PipelineDesign/RARAutocovariance.pdf}
+    \caption{Block diagram depicting an expanded \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/hasselmann/helperFunctions.m}{\lstinline{rarImageIntensityCovariance}} sub-block of Figure \ref{fig:systemDesign.sarSpectrum.blockDiagram}.}
+    \label{fig:systemDesign.sarSpectrum.blockDiagram.rarCo}
+\end{figure}
 
 \subsection{Spectral Expansion} \label{subsec:systemDesign.sarSpectrum.spectralExpan}
 

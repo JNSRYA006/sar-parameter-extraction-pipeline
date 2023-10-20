@@ -152,21 +152,21 @@ Figure \ref{fig:pipelineVal.nVal} shows that after the dispersion relation, n ge
 
 \subsection{Negative $\mathbf{k}$ Wave-number Spectra} \label{subsec:pipelineVal.waveSpecta.invK}
 
-The inverse wave-number spectrum, E$(-\underline{k})$, is required by Equations \ref{eq:hh.var.fR}, \ref{eq:hh.var.fRv} in order to compute the respective co- and autocovariance functions required for the \acs{sar} imaging of ocean waves. In order to verify that this spectrum is correctly generated, plots of both the original and inverse wave-number spectra were compared. The inverse value of $k$ was calculated as \lstinline{k_inv = -k;}. The geometry to determine the $x$ and $y$ components of \lstinline{k_inv} can be found in Section \ref{subsec:theory.waves.waveNumberSpectra.2D}.
+The inverse wave-number spectrum, $E(-\underline{k})$, is required by Equations \ref{eq:hh.var.fR}, \ref{eq:hh.var.fRv} in order to compute the respective co- and autocovariance functions required for the \acs{sar} imaging of ocean waves. In order to verify that this spectrum is correctly generated, plots of both the original and inverse wave-number spectra were compared. The inverse value of $k$ was calculated as \lstinline{k_inv = -k;}. The geometry to determine the $x$ and $y$ components of \lstinline{k_inv} can be found in Section \ref{subsec:theory.waves.waveNumberSpectra.2D}.
 
 \begin{figure}[H]
     \centering
-    \subcaptionbox{Two-dimensional wave-number \acs{jonswap} spectrum, E$(\underline{k})$.\label{fig:pipelineVal.1DWaveSpectrumInv.Ek}}[0.48\linewidth]{
+    \subcaptionbox{Two-dimensional wave-number \acs{jonswap} spectrum, $E(\underline{k})$.\label{fig:pipelineVal.1DWaveSpectrumInv.Ek}}[0.48\linewidth]{
         \resizebox{\linewidth}{!}{\input{Figures/PipelineValidation/Valcontour_E_k}}
     }
-    \subcaptionbox{Two-dimensional inverse wave-number \acs{jonswap} spectrum, E$(-\underline{k})$.\label{fig:pipelineVal.1DWaveSpectrumInv.Ek_inv}}[0.48\linewidth]{
+    \subcaptionbox{Two-dimensional inverse wave-number \acs{jonswap} spectrum, $E(-\underline{k})$.\label{fig:pipelineVal.1DWaveSpectrumInv.Ek_inv}}[0.48\linewidth]{
         \resizebox{\linewidth}{!}{\input{Figures/PipelineValidation/Valcontour_E_k_inv}}
     }
-    \caption{Comparison of E$(\underline{k})$ and E$(-\underline{k})$, from 02-Oct-2023 at 34$\degree$\,S, 18$\degree$\,E. Generated using \acs{ncep} wave data and the \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/waveSpectra/waveNumberSpectrum.m}{\lstinline{waveNumberSpectrum}} function.}
+    \caption{Comparison of $E(\underline{k})$ and $E(-\underline{k})$, from 02-Oct-2023 at 34$\degree$\,S, 18$\degree$\,E. Generated using \acs{ncep} wave data and the \href{https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/blob/main/functions/waveSpectra/waveNumberSpectrum.m}{\lstinline{waveNumberSpectrum}} function.}
     \label{fig:pipelineVal.1DWaveSpectrumInv}
 \end{figure}
 
-Figure \ref{fig:pipelineVal.1DWaveSpectrumInv} shows a side by side comparison of both E$(\underline{k})$ and E$(-\underline{k})$. It can be seen that determining the inverse wave-number spectrum, E$(-\underline{k})$, results in a 'flipped' plot. This plot in Figure \ref{fig:pipelineVal.1DWaveSpectrumInv.Ek_inv} is identical to the plot in Figure \ref{fig:pipelineVal.1DWaveSpectrumInv.Ek}, however, is defined over the negative $k_x$ and $k_y$ axes of those in Figure \ref{fig:pipelineVal.1DWaveSpectrumInv.Ek}. This represents a 180$\degree$ rotation about the $z$-axis of Figure \ref{fig:pipelineVal.1DWaveSpectrumInv.Ek} and is the desired result. Therefore, the generation of an inverse wave-number spectrum can be verified as correct.
+Figure \ref{fig:pipelineVal.1DWaveSpectrumInv} shows a side by side comparison of both $E(\underline{k})$ and $E(-\underline{k})$. It can be seen that determining the inverse wave-number spectrum, $E(-\underline{k})$, results in a 'flipped' plot. This plot in Figure \ref{fig:pipelineVal.1DWaveSpectrumInv.Ek_inv} is identical to the plot in Figure \ref{fig:pipelineVal.1DWaveSpectrumInv.Ek}, however, is defined over the negative $k_x$ and $k_y$ axes of those in Figure \ref{fig:pipelineVal.1DWaveSpectrumInv.Ek}. This represents a 180$\degree$ rotation about the $z$-axis of Figure \ref{fig:pipelineVal.1DWaveSpectrumInv.Ek} and is the desired result. Therefore, the generation of an inverse wave-number spectrum can be verified as correct.
 
 
 \section{\acs{sar} Spectra of Ocean Waves} \label{sec:pipelineVal.sarSpectra}
