@@ -41,9 +41,9 @@ function noaaDataPlot(projection,waveStruct,dataTypeToPlot)
     %c.Label.String = barStr;
     hL = ylabel(c,barStr);     
     set(hL,'Rotation',0);
-    orient(fig,'landscape')
-    print(fig,['../plots/noaa',projection,dataTypeToPlot,'.pdf'],'-dpdf','-fillpage')
-    %title(titleStr);
+    %orient(fig,'landscape')
+    %print(fig,['../plots/noaa',projection,dataTypeToPlot,'.pdf'],'-dpdf','-fillpage')
+    title(titleStr);
     %matlab2tikz(['../plots/noaa',projection,dataTypeToPlot,'.tex']);
 
 end

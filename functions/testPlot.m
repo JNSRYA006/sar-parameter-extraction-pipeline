@@ -26,6 +26,106 @@ transectMSE_2_3 = transectRMSE_2_3^2;
 transectMSE_1_1 = transectRMSE_same^2;
 
 transectMSEStruct = transectMSE(transectData_nc);
+%% GPT Sar Spectra
+% Calculate the 2D Fourier Transform
+spectrum = fftshift(fft2(VV_nc));
+spectrum = abs(spectrum);
+spectrum_index = spectrum > 20;
+spectrum = spectrum_index.*spectrum;
+
+% Calculate the spatial frequencies
+[M, N] = size(VV_nc);
+dx = spectral_bw; % Change this value to match your data scale
+dy = spectral_bw; % Change this value to match your data scale
+% kx = (-M/2:M/2-1) / (M * dx);
+% ky = (-N/2:N/2-1) / (N * dy);
+kx = k_x;
+ky = k_y;
+
+% Calculate Δk (the spacing between k values)
+dkx = kx(2) - kx(1);
+dky = ky(2) - ky(1);
+
+% Define the range of indices to crop spectrum
+startIndexX = round(M/2) - 49; % Adjust as needed
+endIndexX = round(M/2) + 50; % Adjust as needed
+startIndexY = round(N/2) - 49; % Adjust as needed
+endIndexY = round(N/2) + 50; % Adjust as needed
+
+% Select the subset of data for the middle 100x100 points
+spectrumSubset = spectrum(startIndexX:endIndexX, startIndexY:endIndexY);
+kxSubset = kx(startIndexX:endIndexX);
+kySubset = ky(startIndexY:endIndexY);
+
+% Create a grid for the contour plot
+%[X, Y] = meshgrid(kxSubset, kySubset);
+[X, Y] = meshgrid(kx, ky);
+
+% Plot the SAR spectrum with k_x/Δk and k_y/Δk axes using contourf
+figure;
+%contourf(X, Y, 20*log10(abs(spectrum)), 20, 'LineColor', 'none');
+contour(X, Y, 20*log10(spectrum));
+colormap('jet');
+colorbar;
+yline(0);
+xline(0);
+
+% % Set the X and Y axis ticks and labels
+% xticks(unique([min(kxSubset):1:max(kxSubset)]));
+% yticks(unique([min(kySubset):1:max(kySubset)]));
+% xticklabels(unique(string(kxSubset)));
+% yticklabels(unique(string(kySubset)));
+
+xlabel('k_x/Δk');
+ylabel('k_y/Δk');
+
+title('SAR Spectrum with k_x/Δk and k_y/Δk Axes');
+
+
+%% Transect SAR spectrum with circle plots
+%% Get SAR intensity power spectrum
+% Calculate the 2D Fourier transform of the intensity data
+intensityFFT = abs(fftshift(fft2(transectData)));
+dk_x = 0.005890997229533;
+dk_y = -0.005226593472072;
+%%
+%contourf(k_x./dk_x,k_y./dk_y,20*log10(intensityFFT(:,:,1)))
+%contourf(20*log10(intensityFFT(:,:,1)))
+%surf(20*log10(intensityFFT),'LineStyle','none')
+%imagesc(20*log10(intensityFFT))
+figure(3);
+contourf(20*log10(intensityFFT(:,:,1)))
+colorbar;
+title(['Transect 1 SAR Spectrum at ',num2str(th),' degrees'])
+hold on;
+% Define the center and radius of the circle
+centerX = 512/2;  % X-coordinate of the center
+centerY = 512/2;  % Y-coordinate of the center
+radii = [50,100,200,400];  % Radius of the circle
+radii = abs(fft(radii));
+radiiCol = ['r','w','b','bl'];
+for i=1:length(radii)
+    radius = radii(i);
+    rectangle('Position', [centerX - radius,centerY - radius, 2*radius, 2*radius], ...
+    'Curvature', [1, 1], 'EdgeColor', radiiCol(i));  % 'Curvature' set to [1, 1] makes it a circle
+end
+axis equal;  % Equal aspect ratio for proper circle visualization
+hold off;
+%%
+figure(4);
+contourf(20*log10(intensityFFT(:,:,2)))
+colorbar;
+title(['Transect 2 SAR Spectrum at ',num2str(th),' degrees'])
+figure(5);
+contourf(20*log10(intensityFFT(:,:,3)))
+colorbar;
+title(['Transect 3 SAR Spectrum at ',num2str(th),' degrees'])
+
+
+
+
+
+
 
 %%
 figure;

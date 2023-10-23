@@ -1,4 +1,4 @@
-function p_s_k = imageVarianceSpectrum(k,k_x,k_y,waveSpectrum,waveSpectrum_inv,SARmetadata,th)
+function p_s_k = imageVarianceSpectrum(k,k_x,k_y,k_inv,k_x_inv,k_y_inv,waveSpectrum,waveSpectrum_inv,SARmetadata,th)
 % Equation 26 in Hasselmann
 %% Get required metadata
 func = helperFunctions;
