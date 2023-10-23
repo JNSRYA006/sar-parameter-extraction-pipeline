@@ -1,4 +1,4 @@
-function [p_s_ql,beta,xi_sqr] = quasilinearCoeff(k,k_y,k_x,waveSpectrum,SARmetadata,th)
+function [p_s_ql,beta,xi_sqr,k_x] = quasilinearCoeff(k,k_y,k_x,waveSpectrum,SARmetadata,th)
 
 func = helperFunctions;
 
@@ -53,20 +53,39 @@ test_k_neg = -(k_x).^2;
 k_x_cutoff = xi^(-1);
 
 % Cutoff k_x
+% Check if k_x is negative
+if mean(k_x) < 0
+    k_x_cutoff = -k_x_cutoff;
+    negative = 1;
+end    
 % Initialize the index variable
 index = 0;
 % Iterate through the array to find the first index greater than the threshold
-for i = 1:length(k_x)
-    if k_x(i) > k_x_cutoff  
-        index = i;
-        break;  % Exit the loop when the first index is found
-    end
-end
+k_x_cutoff_index = k_x > k_x_cutoff;
+k_x = k_x.*k_x_cutoff_index;
+
+% for i = 1:length(k_x)
+%     if negative
+%         if k_x(i) < k_x_cutoff  
+%             index = i;
+%             break;  % Exit the loop when the first index is found
+%         end  
+%     else    
+%         if k_x(i) > k_x_cutoff  
+%             index = i;
+%             break;  % Exit the loop when the first index is found
+%         end    
+%     end        
+%     % if k_x(i) > k_x_cutoff  
+%     %     index = i;
+%     %     break;  % Exit the loop when the first index is found
+%     % end
+% end
 
 p_s_ql = exp(-(k_x).^2*xi_sqr);
-if ~index == 0
-    p_s_ql = func.resize(p_s_ql(1:index),waveSpectrum(1,:));
-end
+% if ~index == 0
+%     p_s_ql = func.resize(p_s_ql(1:index),waveSpectrum(1,:));
+% end
 end
 
 function beta = getBeta(metadata,orbit_vec_start,num_orbit_vectors,velocity_value_choice)

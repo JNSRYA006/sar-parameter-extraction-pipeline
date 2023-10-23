@@ -15,10 +15,11 @@ r = ones(512);
 VV_nc = transectData_nc(:,:,1);
 th = th(startPos_nc(1,1):startPos_nc(1,3),startPos_nc(1,2):startPos_nc(1,4));
 %% Testing orbital velocity covariance function
+th = incidenceAngle;
 [f_v_r] = orbitalVelocityCovariance(k,k_y,E_k,metadata,r,th);
 figure;
-%contour(k_x,k_y, 20*log10(abs(f_v_r)));
-surf(k_x,k_y, 20*log10(abs(f_v_r)),'lineStyle','none');
+contour(k_x,k_y, 20*log10(abs(f_v_r)));
+%surf(k_x,k_y, 20*log10(abs(f_v_r)),'lineStyle','none');
 xlabel('k_x')
 ylabel('k_y')
 zlabel('20log(abs(f^v(r)))')
@@ -44,7 +45,7 @@ title('RAR image intensity and NL velocity Covariance Function')
 %% Coefficient calculation
 max_k = max(k);
 min_k = min(k);
-[p_s_coeff,beta,xi_sqr] = quasilinearCoeff(k,k_y,k_x,E_k,metadata,th);
+[p_s_coeff,beta,xi_sqr,k_x] = quasilinearCoeff(k,k_y,k_x,E_k,metadata,th);
 %%
 figure;
 %contour(k_x,k_y, 20*log10(abs(p_s_coeff)));
@@ -100,7 +101,7 @@ n=1;
         coeff = ((k_x.*beta).^m);
         if (m == 2*n)
             fprintf('P_(n,2n) used \n')
-            P_s = P_s + coef.*p_s_2n;
+            P_s = P_s + coeff.*p_s_2n;
         end
         if (m == 2*n-1)
             fprintf('P_(n,2n-1) used \n')
@@ -129,6 +130,7 @@ mu_Th = 0.5;
 look = func.getLook(metadata);
 look = func.look(look);
 polarisation = func.getPolarisation(metadata);
+th = incidenceAngle;
 
 % Need to check resizing is correct
 %k_new = func.resize(k,th(1,:));
@@ -147,10 +149,11 @@ Tt_k_inv = func.tiltMTF(polarisation,k_l_inv,th);
 TR_k_inv = func.rarMTF(Tt_k_inv,Th_k_inv);
 
 HRK = exp(-k_x.*xi_sqr).*TR_k;
-
+HRK = func.resize(HRK(:,2:end),th);
+HRK = fftshift(fft(HRK));
 figure;
 %surf(10*log10(abs(HRK)),'LineStyle','none');
-contour(10*log10(abs(HRK)));
+contour(20*log10(abs(HRK)));
 %imagesc(abs(HRK))
 
 %% HVBk
@@ -161,6 +164,8 @@ Tv_k_inv = func.rangeVelocityTF(omega,th,k_l,-k_new);
 Tvb_k_inv = func.velocityBunchingMTF(beta,k_x,Tv_k_inv);
 
 HVbK = exp(-k_x.*xi_sqr).*abs(Tvb_k).^2;
+HVbK = func.resize(HVbK(:,2:end),th);
+HVbK = fftshift(fft(HVbK));
 figure;
 %surf(10*log10(abs(HVbK)),'LineStyle','none');
 contour(10*log10(abs(HVbK)));
@@ -170,6 +175,7 @@ contour(10*log10(abs(HVbK)));
 Ts_k_inv = func.sarImagingMTF(TR_k_inv,Tvb_k_inv);
 Ts_k = func.sarImagingMTF(TR_k,Tvb_k);
 HSK = exp(-k_x.*xi_sqr).*abs(Ts_k).^2; 
+HSK = fftshift(fft(HSK));
 figure;
 %surf(10*log10(abs(HSK)),'LineStyle','none');
 contour(10*log10(abs(HSK)));
@@ -177,14 +183,15 @@ contour(10*log10(abs(HSK)));
 
 %% HintK
 HintK = exp(-k_x.*xi_sqr).*(TR_k.*conj(Tvb_k) + conj(TR_k).*Tvb_k); 
+HintK = fftshift(fft(HintK));
 figure;
 %surf(10*log10(abs(HintK)),'LineStyle','none');
 contour(10*log10(abs(HintK)));
 %imagesc(HintK)
 %% Inversion
-mu = calculateWeight(VV_nc);
+mu = calculateWeight(intensityFFT);
 B = calculateNormalisationConstant(E_k);
-J = costFunction(P_s,VV_nc,E_k,B,mu);
+%J = costFunction(P_s_pipeline,sarData,E_k,B,mu);
 %% Plotting P_s
 % Define for plotting
 [t,r] = meshgrid(theta,k);
@@ -223,7 +230,7 @@ func = helperFunctions;
 % Tvb_k = func.velocityBunchingMTF(beta,k_x,Tv_k);
 % TS_k = func.sarImagingMTF(TR_k,Tvb_k);
 
-P_s_lin = imageVarianceSpectrum(k,k_x,k_y,E_k,E_k_inv,metadata,th);
+P_s_lin = imageVarianceSpectrum(k,k_x,k_y,k_inv,k_x_inv,k_y_inv,E_k,E_k_inv,metadata,th);
 figure;
 %contour(k_x,k_y, 20*log(abs(P_s_lin)));
 surf(k_x,k_y, 20*log10(abs(P_s_lin)),'lineStyle','none');

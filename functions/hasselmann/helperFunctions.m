@@ -1,6 +1,7 @@
 function fh = helperFunctions
 fh.getCaptureDate = @getCaptureDate;
 fh.getNOAAParams = @getNOAAParams;
+fh.getNOAAUrl = @getNOAAUrl;
 fh.look = @lookDiscretise;
 fh.getLook = @getLook;
 fh.getPolarisation = @getPolarisation;
@@ -47,6 +48,10 @@ function [noaaDateStr, noaaHourStr] = getNOAAParams(SARCaptureDate)
     % Return strings in correct format for downloading wave data
     noaaDateStr = [num2str(year(noaaDate)),noaaMonth,noaaDay];
     noaaHourStr = num2str(nearestHour);
+end
+
+function noaaURL = getNOAAUrl(noaaDateStr, noaaHourStr)
+    noaaURL = ['https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gdas.',noaaDateStr,'/',noaaHourStr,'/wave/gridded/gdaswave.t',noaaHourStr,'z.gsouth.0p25.f000.grib2'];
 end
 
 function captureDate = getCaptureDate(metadata)

@@ -71,7 +71,14 @@ legend('show')
 %matlab2tikz('../plots/oneDWaveSpec.tex');
 %% Calcuate S(\omega) for multiple lats and longs
 S = generateMultipleJONSWAP(waveVals,gamma_val,w,1);
-
+%% Sspectral bandwidth calculation
+S_1 = S(:,:,1);
+S_1 = S_1(2:end);
+S_1 = func.resize(S_1(2:end),w);
+S_norm = S_1 / (trapz(S_1).*dw);
+spectral_mean = trapz(w.*S_norm).*dw;
+spectral_var = trapz((w-spectral_mean).^2.*S_norm).*dw;
+spectral_bw = sqrt(spectral_var);
 
 %% 2D plot of S(\omega)
 figure;
@@ -269,11 +276,11 @@ E_k = ((c.*c_g)./w).*E;
 %% k definition of E(k_x,k_y)
 %k = linspace(0,10,252);
 %k = (w.^2./g)';
-k_x = k.*cos(waveVals.direction(1,1));
-k_y = k.*sin(waveVals.direction(1,1));
+k_x = k.*cos(waveVals.direction(2,2));
+k_y = k.*sin(waveVals.direction(2,2));
 
-k_x_inv = k_inv.*cos(waveVals.direction(1,1));
-k_y_inv = k_inv.*sin(waveVals.direction(1,1));
+k_x_inv = k_inv.*cos(waveVals.direction(2,2));
+k_y_inv = k_inv.*sin(waveVals.direction(2,2));
 
 %% Validation of n
 nValidation(k,70,5);
