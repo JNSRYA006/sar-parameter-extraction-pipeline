@@ -57,12 +57,12 @@ zlabel('20log(abs(exp(-k_x^2\xi^2))')
 title('exp(-k_x^2\xi^2)')
 %% Calculate Power Spectrum Pn,2n
 [p_s_2n] = spectralExpansion2n(f_v_r,1);
-figure;
-%contour(k_x,k_y, 20*log10(abs(p_s_2n)));
-surf(k_x,k_y, 20*log10(abs(p_s_2n)),'lineStyle','none');
-xlabel('k_x')
-ylabel('k_y')
-zlabel('20log(abs(P^S_{n,2n}))')
+SARSpectrumPlot(p_s_2n,130,spectralBW);
+%contour(X,Y, 20*log10(abs(subSpectralExpansion2n)));
+%surf(k_x,k_y, 20*log10(abs(p_s_2n)),'lineStyle','none');
+% xlabel('k_x')
+% ylabel('k_y')
+% zlabel('20log(abs(P^S_{n,2n}))')
 title('Power Spectrum, P^S_{n,2n}')
 %% Calculate Power Spectrum Pn,2n-1
 f_rv_r_negative = rarImageIntensityCovariance(k,k_y,E_k,metadata,-1.*r,th);
@@ -256,114 +256,20 @@ contourf(20*log10(intensityFFT))
 colorbar;
 %imagesc(20*log10(intensityFFT))
 %imshow(VV_nc)
-%% Get sea surface elevation
-% CDS data - 4 Aug 2022
-seaLevelDataPath = "C:\Users\ryanj\Downloads\dataset-satellite-sea-level-global-49017144-e287-440f-a59d-61e7b6bf5c91\dt_global_twosat_phy_l4_20220804_vDT2021.nc";
-sealevel = ncinfo(seaLevelDataPath);
-sla = ncread(seaLevelDataPath,'sla');
-lat_sla = ncread(seaLevelDataPath,'latitude');
-long_sla = ncread(seaLevelDataPath,'longitude');
-time_sla = ncread(seaLevelDataPath,'time');
-time_sla = datetime(1950,1,1) + days(time_sla)
-time_sla.Format = 'yyyy-MM-dd';
-%% NOAA (Coastwatch) - 27 Sept 2023 data (Best so far) - Need DTU15
-
-noaa_seaLevelPath = downloadNOAAWaveFile("https://coastwatch.noaa.gov/pub/socd/lsa/rads/sla/daily/nrt/2023/rads_global_nrt_sla_20230927_20230928_001.nc",'download.nc');
-noaa_seaLevel = ncinfo(noaa_seaLevelPath);
-sla = ncread(noaa_seaLevelPath,'sla');
-lat_sla = ncread(noaa_seaLevelPath,'latitude');
-long_sla = ncread(noaa_seaLevelPath,'longitude');
-time_sla = ncread(noaa_seaLevelPath,'time');
-time_sla = datetime(1950,1,1) + days(time_sla)
-time_sla.Format = 'yyyy-MM-dd';
-%% NOAA (S3A)
-noaa_seaLevelPath = downloadNOAAWaveFile("https://www.star.nesdis.noaa.gov/data/pub0010/lsa/johnk/coastwatch/sa/sa_20230928.nc", 'download.nc');
-noaa_seaLevel = ncinfo(noaa_seaLevelPath);
-sla = ncread(noaa_seaLevelPath,'sla');
-lat_sla = ncread(noaa_seaLevelPath,'lat');
-long_sla = ncread(noaa_seaLevelPath,'lon');
-time_sla = ncread(noaa_seaLevelPath,'time');
-time_sla = datetime(1985,1,1) + seconds(time_sla)
-time_sla.Format = 'yyyy-MM-dd';
-
-% sla = sla(830:1876);
-% lat_sla = lat_sla(830:1876);
-% long_sla = long_sla(1:1876);
-% time_sla = time_sla(830:1876);
-
-%% Jason3 - https://podaac.jpl.nasa.gov/dataset/MERGED_TP_J1_OSTM_OST_CYCLES_V51?ids=&values=&search=measures%20v%205.1&provider=POCLOUD
-noaa_seaLevelPath = downloadNOAAWaveFile("https://archive.podaac.earthdata.nasa.gov/podaac-ops-cumulus-protected/MERGED_TP_J1_OSTM_OST_CYCLES_V51/Merged_TOPEX_Jason_OSTM_Jason-3_Cycle_1087.V5_1.nc", 'download.nc');
-noaa_seaLevel = ncinfo(noaa_seaLevelPath);
-ssha = ncread(noaa_seaLevelPath,'ssha'); % sourced in mm
-mssh = ncread(noaa_seaLevelPath,'mssh'); % sourced in mm
-sla = mssh + ssha;
-lat_sla = ncread(noaa_seaLevelPath,'lat');
-long_sla = ncread(noaa_seaLevelPath,'lon');
-time_sla = ncread(noaa_seaLevelPath,'time');
-time_sla = datetime(1992,1,1) + seconds(time_sla);
-time_sla.Format = 'yyyy-MM-dd';
-
-%% Get unique lat and long values
-uniqueLat = unique(round(lat_sla,1));
-uniqueLong = unique(round(long_sla,1));
-
-% Initialize the sla matrix with NaN values
-slaMatrix = nan(length(uniqueLat), length(uniqueLong));
-
-% Assign sla values to the corresponding grid points
-for i = 1:length(lat_sla)
-    latIndex = find(uniqueLat == round(lat_sla(i),1));
-    longIndex = find(uniqueLong == round(long_sla(i)),1);
-    slaMatrix(latIndex, longIndex) = sla(i);
-end
-
-% Now you have slaMatrix as a matrix with corresponding sla values
-%% Find sla val at desired lat and long
-% Define the latitude and longitude coordinates where you want to find SLA
-desiredLat = -34; % Replace with your desired latitude
-desiredLong = 17; % Replace with your desired longitude
-
-% Use interp2 to interpolate the SLA value
-slaValue = interp2(uniqueLong, uniqueLat, slaMatrix, desiredLong, desiredLat);
-
-% Check if the interpolated value is NaN (indicating no data at that point)
-if isnan(slaValue)
-    disp('No data available at the specified coordinates.');
-else
-    fprintf('SLA value at Lat %.3f, Long %.3f: %.3f mm\n', desiredLat, desiredLong, slaValue);
-end
-
-%%
-figure(1)
-
-m_proj('miller','lat',[min(uniqueLat(:)) max(uniqueLat(:))],...
-'lon',[min(uniqueLong(:)) max(uniqueLong(:))])
-
-% Next, plot the field using the M_MAP version of pcolor.
-
-m_pcolor(uniqueLong,uniqueLat,slaMatrix);
-shading flat;
-
-% Add a coastline and axis values.
-
-m_coast('patch',[.7 .7 .7])
-m_grid('box','fancy')
-
-
-
-% Add a colorbar and title.
-
-colorbar
-title('Sea Level Anomaly Height from NOAA (CoastWatch)');
-
 %% Testing integrals
 %dk = k(2) - k(1);
 dth = theta(2) - theta(1);
-M = [1 2];
-int_th = cumsum(D)*dth;
-int_th_trapz = cumtrapz(D)*dth;
+int_th_trapz = cumtrapz(D(:,1))*dth;
 figure;
-plot(theta,int_th,'DisplayName', 'cumsum')
-hold on;
-plot(theta,int_th_trapz,'DisplayName' ,'cumtrapz');
+plot(theta,int_th_trapz,'DisplayName' ,'Area under D(\theta)');
+xlabel('\theta [rad]');
+ylabel('\int D(\theta) \cdot d\theta')
+grid on;
+set(gca,'defaultAxesTickLabelInterpreter','latex'); 
+set(gca,'XTick',L:pi/2:H) 
+set(gca,'XTickLabel',{'','\theta_{wave}-\pi/2','\theta_{wave}','\theta_{wave}+\pi/2',''})
+set(gca,'FontSize',12)
+legend('show')
+yline(1,'LineStyle','--')
+matlab2tikz('../plots/directionalSpreadingVerify.tex');
 
