@@ -64,12 +64,17 @@ To use M_Map please do the following:
 - Download the zipped package here and
 - Add the extracted folder to your MATLAB path
 - _Note:_ A copy of the M_Map package is included on this git repo in the following path: [`toolboxes/m_map`](./toolboxes/m_map)
-3. wgrib
-  ```sh
-  npm install npm@latest -g
-  ```
+3. #### wgrib2
+wgrid2 is a utility package developed by NOAA NCEP and is [available here](https://www.cpc.ncep.noaa.gov/products/wesley/wgrib2/).
+Installation differs depending on your OS. To install and compile wgrib2 for a different OS distribution use the appropriate links.
+- [For Windows](https://ftp.cpc.ncep.noaa.gov/wd51we/wgrib2/Windows10/Installation)
+- [For Linux](https://www.cpc.ncep.noaa.gov/products/wesley/wgrib2/compile_questions.html)
+- [For MacOS](https://www.cpc.ncep.noaa.gov/products/wesley/wgrib2/compile_questions.html)
 
 ### Installation
+In order to install and run this pipeline, the following steps need to be followed.
+1. Clone the repo
+2.
 
 ## Configuration
 
