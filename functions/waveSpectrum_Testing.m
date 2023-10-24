@@ -18,10 +18,10 @@ outStruct = getGribStruct("C:\Users\ryanj\Downloads","C:\Users\ryanj\OneDrive - 
 % Define constants
 g = 9.81;
 
-latStart = grid_lat(1,3)
-latEnd = grid_lat(1,3)
-lonStart = grid_lon(1,1)
-lonEnd = grid_lon(1,2)
+latStart = gridLat(1,3)
+latEnd = gridLat(1,3)
+lonStart = gridLon(1,1)
+lonEnd = gridLon(1,2)
 %%
 % Get range of values in lat and long
 waveVals = getSubsetWaveVals(outStruct,latStart,lonStart,latEnd,lonEnd);
@@ -159,8 +159,8 @@ s = 2./(deg2rad(sig_th).^2) - 1;
 Tp = waveVals.significantWavePeriod(1,1)./0.95;
 %m = 0.0585.*Tp.^2 - 0.3988.*Tp + 3.0546;
 %theta = (-pi:0.025:pi)'; % Old definition of theta
-th_wave = waveVals.direction(1,1);
-th_wind = waveVals.windDirection(1,1);
+th_wave = waveVals.direction(2,2);
+th_wind = waveVals.windDirection(2,2);
 
 low = th_wave - pi;
 high = th_wave + pi;
@@ -235,9 +235,9 @@ set(gca,'XTickLabel',{'-2\pi','-3\pi/2','-\pi','-\pi/2','0','\pi/2','\pi', '3\pi
 set(gca,'YTick',-2*pi:pi/2:2*pi) 
 set(gca,'YTickLabel',{'-2\pi','-3\pi/2','-\pi','-\pi/2','0','\pi/2','\pi', '3\pi/2', '2\pi'})
 set(gca,'FontSize',12)
-%matlab2tikz('../plots/contour_E_omega.tex');
+matlab2tikz('../plots/contour_E_omega.tex');
 %% 3D Spectrum
-figure;
+fig = figure;
 h=surf(x,y,E);
 grid on;
 xlabel('\omega [rad/s]'), ylabel('\omega [rad/s]');
@@ -245,12 +245,12 @@ set(gca,'XTick',-2*pi:pi/2:2*pi)
 set(gca,'XTickLabel',{'-2\pi','-3\pi/2','-\pi','-\pi/2','0','\pi/2','\pi', '3\pi/2', '2\pi'})
 set(gca,'YTick',-2*pi:pi/2:2*pi) 
 set(gca,'YTickLabel',{'-2\pi','-3\pi/2','-\pi','-\pi/2','0','\pi/2','\pi', '3\pi/2', '2\pi'})
-set(gca,'FontSize',22)
+set(gca,'FontSize',32)
 set(h,'LineStyle','none');
 c = colorbar;
 %c.Label.String = barStr;
-hL = ylabel(c,'[m^2/rad/Hz]');
-set(hL,'Rotation',0);
+ylabel(c,'[m^2/rad/Hz]');
+%set(hL,'Rotation',0);
 % figure(6);
 % h = surf(w,theta,E_cleaned);
 % set(h,'LineStyle','none');
@@ -258,6 +258,8 @@ set(hL,'Rotation',0);
 % ylabel('\theta (rad)')
 zlabel('E(\omega,\theta)')
 %matlab2tikz('../plots/surf_E_omega.tex');
+% orient('landscape')
+% print('../plots/surf_E_omega.pdf','-dpdf','-bestfit')
 
 %% Calculate E(k_x,k_y)
 d = 70;
@@ -306,15 +308,17 @@ set(gca,'FontSize',12)
 figure;
 h=surf(k_x,k_y,E_k);
 grid on;
-xlabel('$k_{x}$','interpreter','latex'), ylabel('$k_{y}$','interpreter','latex'),zlabel('$E(k_{x},k_{y})$','interpreter','latex');
+xlabel('$k_{x}$','interpreter','latex'), ylabel('$k_{y}$','interpreter','latex'),zlabel('$E(k_{x},k_{y})$','Interpreter','latex');
 set(h,'LineStyle','none');
 c = colorbar;
 %c.Label.String = barStr;
 hL = ylabel(c,'[m^2/rad/Hz]');
-set(hL,'Rotation',0);
+%set(hL,'Rotation',0);
 set(gca,'FontSize',32)
 %set(gca,'XTick',-pi/2:pi/6:pi/2) 
 %set(gca,'XTickLabel',{'-\pi/2','-\pi/3','-\pi/6','0','\pi/6', '\pi/3', '\pi/2'})
 %set(gca,'YTick',-pi/2:pi/6:pi/2) 
 %set(gca,'YTickLabel',{'-\pi/2','-\pi/3','-\pi/6','0','\pi/6', '\pi/3', '\pi/2'})
 %matlab2tikz('../plots/surf_E_k.tex');
+% orient('landscape')
+% print('../plots/surf_E_k.pdf','-dpdf','-bestfit')

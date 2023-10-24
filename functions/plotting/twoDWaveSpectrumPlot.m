@@ -27,7 +27,7 @@ if wOrK
         c = colorbar;
         %c.Label.String = barStr;
         hL = ylabel(c,'[m^2/rad/Hz]');
-        set(hL,'Rotation',0);
+        %set(hL,'Rotation',0);
         %set(gca,'FontSize',32)
         title('Surface plot of E(k_x,k_y)')
         %set(gca,'XTick',-pi/2:pi/6:pi/2) 
@@ -71,7 +71,7 @@ else
         c = colorbar;
         %c.Label.String = barStr;
         hL = ylabel(c,'[m^2/rad/Hz]');
-        set(hL,'Rotation',0);
+        %set(hL,'Rotation',0);
         % figure(6);
         % h = surf(w,theta,E_cleaned);
         % set(h,'LineStyle','none');
