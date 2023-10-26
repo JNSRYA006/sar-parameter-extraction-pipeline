@@ -28,13 +28,13 @@ transectMSE_1_1 = transectRMSE_same^2;
 transectMSEStruct = transectMSE(transectData_nc);
 %% GPT Sar Spectra
 % Calculate the 2D Fourier Transform
-spectrum = fftshift(fft2(VV_nc));
+spectrum = fftshift(fft2(transectData));
 spectrum = abs(spectrum);
 spectrum_index = spectrum > 20;
 spectrum = spectrum_index.*spectrum;
 
 % Calculate the spatial frequencies
-[M, N] = size(VV_nc);
+[M, N] = size(transectData(:,:,1));
 dx = spectral_bw; % Change this value to match your data scale
 dy = spectral_bw; % Change this value to match your data scale
 % kx = (-M/2:M/2-1) / (M * dx);

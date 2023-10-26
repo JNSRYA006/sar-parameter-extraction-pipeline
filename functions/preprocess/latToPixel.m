@@ -6,7 +6,7 @@ function [topLeftPixelx, topLeftPixely] = latToPixel(latGrid, lonGrid, topLeftLa
     commonRowIndices = intersect(latIndexRow, lonIndexRow);
     commonColIndices = intersect(latIndexCol, lonIndexCol);
     
-    topLeftPixelx = min(commonRowIndices)-256;
-    topLeftPixely = min(commonColIndices)-256;
+    topLeftPixelx = max(commonRowIndices)-256;
+    topLeftPixely = max(commonColIndices)-256;
 
 end

@@ -42,7 +42,7 @@ waveSpectrum = waveSpectrum(2:end,2:end);
 waveSpectrum = func.resize(waveSpectrum,th);
 
 % Remove NaN values manually
-waveSpectrum_inv = waveSpectrum_inv(2:end,2:end);
+waveSpectrum_inv = waveSpectrum_inv(2:end,1:end-1);
 
 % Resize the matrix to 2001x2001
 waveSpectrum_inv = func.resize(waveSpectrum_inv,th);

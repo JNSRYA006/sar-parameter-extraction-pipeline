@@ -25,7 +25,7 @@ waveSpectrum = waveSpectrum(2:end,2:end);
 
 waveSpectrum = func.resize(waveSpectrum,th);
 Tv_k = func.rangeVelocityTF(omega,th,k_l,k_new);
-Tv_k = func.resize(Tv_k(:,2:end),waveSpectrum);
+Tv_k = func.resize(Tv_k(:,2:end-1),waveSpectrum);
 % NEED TO FIGURE OUT HOW TO GET v
 for i=2:length(k)
     dk(i) = k(i)-k(i-1);
@@ -51,6 +51,7 @@ xi_sqr = beta.^2.*trapz(trapz(waveSpectrum.*abs(Tv_k).^2).*dk_x).*dk_y;
 xi = sqrt(xi_sqr);
 test_k_neg = -(k_x).^2;
 k_x_cutoff = xi^(-1);
+negative = 0;
 
 % Cutoff k_x
 % Check if k_x is negative
@@ -61,9 +62,13 @@ end
 % Initialize the index variable
 index = 0;
 % Iterate through the array to find the first index greater than the threshold
-k_x_cutoff_index = k_x > k_x_cutoff;
-k_x = k_x.*k_x_cutoff_index;
-
+if negative
+    k_x_cutoff_index = k_x > k_x_cutoff;
+    k_x = k_x.*k_x_cutoff_index;
+else    
+    k_x_cutoff_index = k_x < k_x_cutoff;
+    k_x = k_x.*k_x_cutoff_index;
+end
 % for i = 1:length(k_x)
 %     if negative
 %         if k_x(i) < k_x_cutoff  

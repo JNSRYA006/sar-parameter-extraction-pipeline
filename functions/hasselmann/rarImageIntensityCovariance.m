@@ -40,6 +40,7 @@ look = func.look(look);
 k_new = k;
 %k_y = func.resize(k_y,th(1,:));
 k_l = func.kl(look,k_y);
+k_l_inv = func.kl(look,fliplr(-k_y));
 omega = func.omega(k_new);
 %% Could be wrong
 % Create a logical mask for rows with NaN entries
@@ -54,16 +55,16 @@ mu = 0.5;
 Tt_k = func.tiltMTF(polarisation,k_l,th);
 Th_k = func.hydroMTF(omega,mu,k_new,k_y);
 Th_k = func.resize(Th_k(2:end),waveSpectrum(1,:));
-Tt_k_inv = func.tiltMTF(polarisation,k_l,th);
-Th_k_inv = func.hydroMTF(omega,mu,-k_new,k_y);
-Th_k_inv = func.resize(Th_k_inv(2:end),waveSpectrum(1,:));
+Tt_k_inv = func.tiltMTF(polarisation,k_l_inv,th);
+Th_k_inv = func.hydroMTF(omega,mu,fliplr(-k_new),fliplr(-k_y));
+Th_k_inv = func.resize(Th_k_inv(1:end-1),waveSpectrum(1,:));
 Tr_k = func.rarMTF(Tt_k,Th_k);
 Tr_k_inv = func.rarMTF(Tt_k_inv,Th_k_inv);
 
 Tv_k = func.rangeVelocityTF(omega,th,k_l,k_new);
 Tv_k = func.resize(Tv_k(:,2:end),waveSpectrum);
-Tv_k_inv = func.rangeVelocityTF(omega,th,k_l,-k_new);
-Tv_k_inv = func.resize(Tv_k_inv(:,2:end),waveSpectrum);
+Tv_k_inv = func.rangeVelocityTF(omega,th,k_l_inv,fliplr(-k_new));
+Tv_k_inv = func.resize(Tv_k_inv(:,1:end-1),waveSpectrum);
 
 for i=2:length(k)
     dk(i) = k(i)-k(i-1);
