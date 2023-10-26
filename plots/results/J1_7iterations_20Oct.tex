@@ -1,0 +1,41 @@
+% This file was created by matlab2tikz.
+%
+%The latest updates can be retrieved from
+%  http://www.mathworks.com/matlabcentral/fileexchange/22022-matlab2tikz-matlab2tikz
+%where you can also make suggestions and rate matlab2tikz.
+%
+\definecolor{mycolor1}{rgb}{0.00000,0.44700,0.74100}%
+%
+\begin{tikzpicture}
+
+\begin{axis}[%
+width=4.521in,
+height=3.566in,
+at={(0.758in,0.481in)},
+scale only axis,
+xmin=1,
+xmax=7,
+xlabel style={font=\color{white!15!black}},
+xlabel={Iterations},
+ymin=0,
+ymax=140000000,
+ylabel style={font=\color{white!15!black}},
+ylabel={J},
+axis background/.style={fill=white},
+xmajorgrids,
+xminorgrids,
+ymajorgrids,
+yminorgrids
+]
+\addplot [color=mycolor1, forget plot]
+  table[row sep=crcr]{%
+1	2601077.52970712\\
+2	10405173.6778652\\
+3	23419712.5395918\\
+4	41661780.1313717\\
+5	65120357.1854236\\
+6	93846742.8680486\\
+7	127691692.326389\\
+};
+\end{axis}
+\end{tikzpicture}%

@@ -14,19 +14,19 @@ function SARSpectrumPlot(intensityFFT,spectrumThreshold,spectralBW,normaliseAxes
     dkx = kx(2) - kx(1);
     dky = ky(2) - ky(1);
     
-    subIntensityFFT = intensityFFT(231:281,231:281);
-    % subIntensityFFT = intensityFFT;
+    % subIntensityFFT = intensityFFT(231:281,231:281);
+    subIntensityFFT = intensityFFT;
     if normaliseAxes
         % Create a grid for the contour plot
         [X, Y] = meshgrid(kx/dkx, ky/dky);
-        X = X(231:281,231:281);
-        Y = Y(231:281,231:281);
+        % X = X(231:281,231:281);
+        % Y = Y(231:281,231:281);
         labelX = 'k_x/\Deltak';
         labelY = 'k_y/\Deltak';
     else
         [X, Y] = meshgrid(kx, ky);
-        X = X(231:281,231:281);
-        Y = Y(231:281,231:281);
+        % X = X(231:281,231:281);
+        % Y = Y(231:281,231:281);
         labelX = 'k_x';
         labelY = 'k_y';
     end
