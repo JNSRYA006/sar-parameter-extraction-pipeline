@@ -3,7 +3,6 @@ function noaaDataPlot(projection,waveStruct,dataTypeToPlot)
 
     lat = waveStruct.latitude;
     lon = waveStruct.longitude;
-    %data = waveStruct.dataTypeToPlot;
     switch dataTypeToPlot
         case 'significantWaveHeight'
             titleStr = ['Significant Wave Height from NOAA (NCEP) - ',char(waveStruct.time)];

@@ -6,17 +6,11 @@ g = 9.81;
 iterationsLin = linspace(1,iterations,iterations);
 sigWaveHeight = zeros(iterations,1);
 sigWavePeriod = zeros(iterations,1);
-% dk_x = 0.005890997229533;
-% dk_y = 0.005226593472072;
 P_s_lin = func.resize(imageVarianceSpectrum(:,2:end-1),firstGuessWaveSpectrum);
 E_k = func.resize(firstGuessWaveSpectrum(2:end,2:end),P_s_lin);
 E_k_inv = func.resize(inverseFirstGuessWaveSpectrum(2:end,1:end-1),firstGuessWaveSpectrum);
 Ts_k = func.resize(Ts_k(:,2:end),firstGuessWaveSpectrum);
 Ts_k_inv = func.resize(Ts_k_inv(:,1:end-1),firstGuessWaveSpectrum);
-
-% p_s_coeff_inv = quasilinearCoeff(k_inv,k_y_inv,k_x_inv,inverseFirstGuessWaveSpectrum,metadata,incidenceAngle);
-% 
-% 
 Pn = generatedSARSpectrum;
 En = firstGuessWaveSpectrum;
 
@@ -25,25 +19,10 @@ for j=1:iterations
     [J(j),deltaEn,En,deltaPn] = costFunctionCalculation(generatedSARSpectrum,observedSARSpectrum,En,E_k_inv,B,mu,Ts_k,Ts_k_inv,P_s_lin,quasilinearCoeff,invQuasilinearCoeff,numOfIterations,dk_x,dk_y);
     Pn = generateSARSpectrumOceanWaves(k,k_y,k_x,En,metadata,incidenceAngle,r,1,w);
     En = abs(En);
-    %J_alt(j) = abs(costFunction2(P_s_pipeline,intensityFFT,E_k,En,B,mu,dk_x,dk_y));
     deltaEn = func.resize(deltaEn(2:end,2:end),E_k);
     En = func.resize(En(2:end,2:end),E_k);
     
-    % Convert back to th, w
-    d = 70;
-    c = sqrt((g./k).*tanh(k.*d)); % tanh in radians (eq. 5.4.23 in holthuisjen) output in m/s^2
-    n = 0.5*(1+(2.*k.*d)./sinh(2.*k.*d)); % sinh in radians (eq. 5.4.32 in holthuisjen)
-    c_g = n.*c;
-    En_w_th = En./((c.*c_g)./w);
-    En_w_th = func.resize(En_w_th(:,2:end),E_k);
-    
-    for i=2:length(theta)
-        dth(i) = theta(i)-theta(i-1);
-    end
-    dth = mean(dth);
-    
-    En_w = En_w_th/D(:,1)';
-    %En_w = trapz(En_w_th,2).*dth;
+    [En_w, En_w_th] = waveNumberConvert(En,k,w,theta,D,d);
     
     % Get out wave parameters
     peakVal = max(En_w);

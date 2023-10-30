@@ -1,6 +1,4 @@
 function [transectMSEStruct] = transectMSE(transectData)
-%UNTITLED Summary of this function goes here
-%   Detailed explanation goes here
     % Get the number of matrices (n)
     dataSize = size(transectData, 3);
     

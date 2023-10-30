@@ -23,30 +23,17 @@ function [f_rv_r] = rarImageIntensityCovariance(k,k_y,waveSpectrum,SARmetadata,r
 
 % x-axis = SAR flight direction (azimuthal) (heading)
 
-%% Get required metadata
-%[look,inc_near,inc_far,num_pixels,polarisation] = getMetadata_f_rv_r(SARmetadata);
 func = helperFunctions;
 
 look = func.getLook(SARmetadata);
 polarisation = func.getPolarisation(SARmetadata);
 
 look = func.look(look);
-%th = ncread(SARmetadata.Filename,"Incidence_Angle");
-%th = func.incidence(inc_near,inc_far,num_pixels);
-%th = extrapolateIncidence(inc_near,inc_far,num_pixels); % Need to calculate based on velocity and look time
-
-% Need to check resizing is correct
-%k_new = func.resize(k,th(1,:));
 k_new = k;
-%k_y = func.resize(k_y,th(1,:));
 k_l = func.kl(look,k_y);
 k_l_inv = func.kl(look,fliplr(-k_y));
 omega = func.omega(k_new);
-%% Could be wrong
-% Create a logical mask for rows with NaN entries
-nanRows = any(isnan(waveSpectrum), 2);
 
-% Remove rows with NaN entries
 waveSpectrum = waveSpectrum(2:end,2:end);
 
 waveSpectrum = func.resize(waveSpectrum,th);
@@ -71,9 +58,6 @@ for i=2:length(k)
 end
 dk = dk(2:end);
 dk = mean(dk);
-% Figure out r value!!
-
-% Need to figure out how to get F(-k)
 
 f_rv_r = 0.5.*cumtrapz((waveSpectrum.*Tr_k.*conj(Tv_k))+(waveSpectrum.*conj(Tr_k_inv).*Tv_k_inv).*exp(1i.*k_new.*r)).*dk;
 

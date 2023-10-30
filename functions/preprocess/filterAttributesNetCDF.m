@@ -2,7 +2,7 @@ function metadata = filterAttributesNetCDF(metadata_struc, attribute)
 % filterAttributesNetCDF takes in a structure containing metadata (obtained
 % using meta_nc = ncinfo(filepath,'metadata');), as well as a list of strings of the
 % desired attributes to filter. A list of available attribute types are
-% available here: 
+% available in the Appendix of the report. 
 % The function outputs a 1xlength(attributes) structure with all the
 % original metadata columns preserved
 prefix = 'Abstracted_Metadata:';
@@ -15,12 +15,6 @@ attribute_update = strings(num_attributes);
 for i=1:num_attributes
     attribute_update(i) = prefix + attribute(i);
 end
-
-%% Check if attribute is part of the structure
-% if ~isfield(metadata_struc, attribute)
-%         error('Attribute, %s, does not exist in the structure, %s. \n', attribute,metadata_struc); 
-% end
-%test_val = metadata_struc(metadata_struc.Name == 'MISSION');
 
 %% Extract input attributes and filter out columns
 for i = 1:num_attributes

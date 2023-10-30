@@ -16,7 +16,6 @@ while i <= endDepth
     i = i + step;
     j = j+1;
 end
-%d_vals_w_0 = [0,d_vals(2:end)];
 % Plot range of d over n
 figure;
 plot(d_vals,n_vals);
