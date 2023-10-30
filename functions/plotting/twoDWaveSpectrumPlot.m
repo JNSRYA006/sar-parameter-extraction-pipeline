@@ -7,6 +7,7 @@ if wOrK
         figure;
         contour(k_x,k_y,E_k)
         grid on;
+        grid minor;
         yline(0);
         xline(0);
         xlabel('$k_{x}$','interpreter','latex'), ylabel('$k_{y}$','interpreter','latex');

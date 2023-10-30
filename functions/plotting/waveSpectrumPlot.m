@@ -1,10 +1,7 @@
 function waveSpectrumPlot(waveVals,S,w,singleOrMultiple,displayw,plotAllLats,plotAllLons)
 
 if singleOrMultiple
-    figure;
-    %plot(w,S/(T0*Hs^2))
-    %title('S(\omega)/(H_s^2 T_0)')
-    
+    figure;    
     hold on;
     if plotAllLats
         n = length(waveVals.longitude);        
@@ -46,10 +43,6 @@ if singleOrMultiple
         %fprintf('Iteration %d: Latitude %.2f, Longitude %.2f\n', i, testLat(lat_index), testLon(lon_index));
     end
     hold off
-
-    %figure;
-    %plot(w,S(:,1));
-    %plot(f,S);
     title('One-dimensional wave spectrum, E(\omega)')
     %legend('show');
     %legend('JONSWAP for \gamma = 1.308','Location','Northeast')
@@ -65,13 +58,18 @@ if singleOrMultiple
     %matlab2tikz('../plots/valWaveSpec_toShore_1.tex');
 else
     figure;
-    plot(w,S);
-    %plot(f,S);
+    colourToPlot = '#0072bd';
+    plot(w,S,'Color',colourToPlot);
+    maxIndex = find(S == max(S));
     title(['One-dimensional wave spectrum, E(\omega) at ', num2str(waveVals.latitude(1,1)), 'S, ', num2str(waveVals.longitude(1,1)), 'E'])
-    legend('JONSWAP for \gamma = 1.308','Location','Northeast')
+    %legend('JONSWAP for \gamma = 1.308','Location','Northeast')
     xlabel('\omega [rad/s]')
     ylabel('E(\omega) [m^2/rad/Hz]')
     grid on;
+    S(maxIndex);
+    if displayw
+        xline(w(maxIndex),LineWidth=1,DisplayName=['\omega = ',num2str(round(w(maxIndex),3))],Color=colourToPlot,LineStyle="--");
+    end
     % set(gca,'XTick',0:0.25:1) 
     % set(gca,'XTickLabel',{'0','0.25','0.5','0.75','1'})
     set(gca,'XTick',0:pi/2:2*pi) 

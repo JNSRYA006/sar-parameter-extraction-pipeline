@@ -23,29 +23,17 @@ function [f_rv_r] = rarImageIntensityCovariance(k,k_y,waveSpectrum,SARmetadata,r
 
 % x-axis = SAR flight direction (azimuthal) (heading)
 
-%% Get required metadata
-%[look,inc_near,inc_far,num_pixels,polarisation] = getMetadata_f_rv_r(SARmetadata);
 func = helperFunctions;
 
 look = func.getLook(SARmetadata);
 polarisation = func.getPolarisation(SARmetadata);
 
 look = func.look(look);
-%th = ncread(SARmetadata.Filename,"Incidence_Angle");
-%th = func.incidence(inc_near,inc_far,num_pixels);
-%th = extrapolateIncidence(inc_near,inc_far,num_pixels); % Need to calculate based on velocity and look time
-
-% Need to check resizing is correct
-%k_new = func.resize(k,th(1,:));
 k_new = k;
-%k_y = func.resize(k_y,th(1,:));
 k_l = func.kl(look,k_y);
+k_l_inv = func.kl(look,fliplr(-k_y));
 omega = func.omega(k_new);
-%% Could be wrong
-% Create a logical mask for rows with NaN entries
-nanRows = any(isnan(waveSpectrum), 2);
 
-% Remove rows with NaN entries
 waveSpectrum = waveSpectrum(2:end,2:end);
 
 waveSpectrum = func.resize(waveSpectrum,th);
@@ -54,25 +42,22 @@ mu = 0.5;
 Tt_k = func.tiltMTF(polarisation,k_l,th);
 Th_k = func.hydroMTF(omega,mu,k_new,k_y);
 Th_k = func.resize(Th_k(2:end),waveSpectrum(1,:));
-Tt_k_inv = func.tiltMTF(polarisation,k_l,th);
-Th_k_inv = func.hydroMTF(omega,mu,-k_new,k_y);
-Th_k_inv = func.resize(Th_k_inv(2:end),waveSpectrum(1,:));
+Tt_k_inv = func.tiltMTF(polarisation,k_l_inv,th);
+Th_k_inv = func.hydroMTF(omega,mu,fliplr(-k_new),fliplr(-k_y));
+Th_k_inv = func.resize(Th_k_inv(1:end-1),waveSpectrum(1,:));
 Tr_k = func.rarMTF(Tt_k,Th_k);
 Tr_k_inv = func.rarMTF(Tt_k_inv,Th_k_inv);
 
 Tv_k = func.rangeVelocityTF(omega,th,k_l,k_new);
 Tv_k = func.resize(Tv_k(:,2:end),waveSpectrum);
-Tv_k_inv = func.rangeVelocityTF(omega,th,k_l,-k_new);
-Tv_k_inv = func.resize(Tv_k_inv(:,2:end),waveSpectrum);
+Tv_k_inv = func.rangeVelocityTF(omega,th,k_l_inv,fliplr(-k_new));
+Tv_k_inv = func.resize(Tv_k_inv(:,1:end-1),waveSpectrum);
 
 for i=2:length(k)
     dk(i) = k(i)-k(i-1);
 end
 dk = dk(2:end);
 dk = mean(dk);
-% Figure out r value!!
-
-% Need to figure out how to get F(-k)
 
 f_rv_r = 0.5.*cumtrapz((waveSpectrum.*Tr_k.*conj(Tv_k))+(waveSpectrum.*conj(Tr_k_inv).*Tv_k_inv).*exp(1i.*k_new.*r)).*dk;
 

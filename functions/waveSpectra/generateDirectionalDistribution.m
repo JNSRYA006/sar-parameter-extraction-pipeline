@@ -10,8 +10,6 @@ switch freqChoice
         freqSig = 2*pi./Tsig;
         freqP = 2*pi./Tp;
 end
-%freqSig = 2*pi./Tsig;
-%freqP = 2*pi./Tp;
 sig_th = 26.9.*((freqSig)/(freqP)).^(-1.05); % in degrees
 for i=1:length(freqArray)
     if (freqArray(i)>=freqP)
@@ -21,20 +19,8 @@ for i=1:length(freqArray)
 
     end
 end
-% for i=1:length(freqArray)
-%     if (freqArray(i)>=freqP)
-%         sig_th(i) = 26.9.*((freqArray(i))/(freqP)).^(0.68);
-%     else
-%         sig_th(i) = 26.9.*((freqArray(i))/(freqP)).^(-1.05); % in degrees
-% 
-%     end
-% end
-%sig_th = 30;
 s = 2./(deg2rad(sig_th).^2) - 1;
-%s = 84;
 Tp = waveStruct.significantWavePeriod(1,1)./0.95;
-%m = 0.0585.*Tp.^2 - 0.3988.*Tp + 3.0546;
-%theta = (-pi:0.025:pi)'; % Old definition of theta
 th_wave = waveStruct.direction(1,1);
 th_wind = waveStruct.windDirection(1,1);
 

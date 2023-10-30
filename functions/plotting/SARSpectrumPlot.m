@@ -1,4 +1,4 @@
-function SARSpectrumPlot(intensityFFT,spectrumThreshold,spectralBW)
+function SARSpectrumPlot(intensityFFT,spectrumThreshold,spectralBW,normaliseAxes)
 
     spectrumIndex = intensityFFT > spectrumThreshold;
     intensityFFT = spectrumIndex.*intensityFFT;
@@ -15,14 +15,25 @@ function SARSpectrumPlot(intensityFFT,spectrumThreshold,spectralBW)
     dky = ky(2) - ky(1);
     
     subIntensityFFT = intensityFFT(231:281,231:281);
-    
-    % Create a grid for the contour plot
-    [X, Y] = meshgrid(kx/dkx, ky/dky);
-    X = X(231:281,231:281);
-    Y = Y(231:281,231:281);
+    % subIntensityFFT = intensityFFT;
+    if normaliseAxes
+        % Create a grid for the contour plot
+        [X, Y] = meshgrid(kx/dkx, ky/dky);
+        X = X(231:281,231:281);
+        Y = Y(231:281,231:281);
+        labelX = 'k_x/\Deltak';
+        labelY = 'k_y/\Deltak';
+    else
+        [X, Y] = meshgrid(kx, ky);
+        X = X(231:281,231:281);
+        Y = Y(231:281,231:281);
+        labelX = 'k_x';
+        labelY = 'k_y';
+    end
     % Plot the SAR spectrum with k_x/Δk and k_y/Δk axes using contourf
     figure;
-    %contourf(X, Y, 20*log10(abs(intensityFFT)), 20, 'LineColor', 'none');
+    %contourf(X, Y, 20*log10(abs(subIntensityFFT)), 20, 'LineColor', 'none');
+    %surf(X,Y,20*log10(subIntensityFFT),'LineStyle','none');
     contour(X, Y, 20*log10(subIntensityFFT),'LineWidth',0.5);
     %imagesc(kx/dkx,ky/dky,20*log10(intensityFFT));
     colormap('jet');
@@ -30,6 +41,8 @@ function SARSpectrumPlot(intensityFFT,spectrumThreshold,spectralBW)
     cb.Label.String = 'Power Spectrum [dB]';
     yline(0,'LineWidth',0.25);
     xline(0);
+    grid on;
+    grid minor;
     
     % % Set the X and Y axis ticks and labels
     % xticks(unique([min(kxSubset):1:max(kxSubset)]));
@@ -37,8 +50,8 @@ function SARSpectrumPlot(intensityFFT,spectrumThreshold,spectralBW)
     % xticklabels(unique(string(kxSubset)));
     % yticklabels(unique(string(kySubset)));
     
-    xlabel('k_x/\Deltak');
-    ylabel('k_y/\Deltak');
+    xlabel(labelX);
+    ylabel(labelY);
     
     %title('Observed SAR Spectrum');
 

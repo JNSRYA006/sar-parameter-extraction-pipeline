@@ -20,7 +20,6 @@ end
 
 transectData = zeros(512,512,n);
 vertices = zeros(n,4);
-%annotations = zeros(n,2);
 
 xStart = topLeft_x;
 xEnd = topLeft_x + 511;
