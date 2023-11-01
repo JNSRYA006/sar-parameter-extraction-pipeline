@@ -3,13 +3,13 @@ This directory contains the MATLAB code that was written for an undergraduate fi
 
 This folder contains all functions used in implementing the pipeline. The folder is broken down into three sub-folders, each containing the respective functions for the associated folder name. A description of the various folders and functions contained within this directory is given below.
 
-#### [`hasselmann`](./hasselmann)
+#### [`/hasselmann`](./hasselmann)
 This folder contains all functions used in implementing the [Hasselmann and Hasselmann](https://agupubs.onlinelibrary.wiley.com/doi/10.1029/91JC00302) procedure and its inversion. These functions are implemented in the pipeline and can be individually run.
 
-#### [`plotting`](./plotting)
+#### [`/plotting`](./plotting)
 This folder contains all functions used for generating plots of the respective spectra and validation plots.
 
-#### [`waveSpectra`](./waveSpectra)
+#### [`/waveSpectra`](./waveSpectra)
 This folder contains all functions used to generate the respective spectra used as an input to the Hasselmann and Hasselmann inversion procedure. Data used in generating these spectra can be obtained from [NOAA NCEP](https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/).
 
 ##### [`downloadNOAAWaveFile`](./downloadNOAAWaveFile.m)
