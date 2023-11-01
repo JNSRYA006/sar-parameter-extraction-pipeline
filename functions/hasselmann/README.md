@@ -1,10 +1,17 @@
 # SAR Parameter Extraction Pipeline
-This directory contains the associated documentation produced for an undergraduate final-year project (EEE4022S) at the University of Cape Town. The aim of the project was to design a parameter extraction pipeline for SAR images to extract the sea ice characteristics of Antarctica.
+This directory contains the MATLAB code that was written for an undergraduate final-year project (EEE4022S) at the University of Cape Town. The aim of the project was to perform an initial investigation into designing a parameter extraction pipeline for SAR images to extract the sea ice characteristics of Antarctica.
 
-A description of the various files contained within this directory is given below.
+This folder contains all functions used in implementing the Hasselmann procedure.
 
-#### [`report`](./JNSRYA006_EEE4022S_RAV2023-03.pdf/)
-This is the submitted report for this project and contains an overview of the design and implementation procedure.
+##### [`helperFunctions`](./helperFunctions.m)
+This function structure contains all utility functions used to calculate the required Modulation Transfer Functions (MTF)s in the implementation. All the additional metadata functions are contained herein. The functions are called using the following command:
 
-#### [`pipeline`](./pipeline.pdf/)
-This is a PDF version of an unrun version of the MATLAB live-script. Known as the pipeline.
+```
+func = helperFunctions;
+look = func.getLook(metadata) % Example call of a function contained in the helperFunctions function structure
+```
+##### [`generateSARSpectrumOceanWaves`](./generateSARSpectrumOceanWaves.m)
+This function generates the equivalent SAR spectrum of a given ocean wave spectrum according to the Hasselmann procedure.
+
+##### [`inversion`](./inversion.m)
+This function acts as the inversion of the Hasselmann procedure and iterates the cost function for a user-defined number of iterations.
