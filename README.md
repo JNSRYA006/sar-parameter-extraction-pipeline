@@ -28,7 +28,11 @@ This repository contains the MATLAB code that was written for an undergraduate f
 
 ## Repo Overview
 
-A description of the various folders and functions contained within this directory is given below.
+A description of the various folders and functions contained within this directory is given below. A visual representation of the pipeline is shown below.
+
+![Pipeline visual overview](./docs/pipelineOverview.png)
+
+
 ### [`docs`](./docs/)
 
 
