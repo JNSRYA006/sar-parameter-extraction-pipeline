@@ -35,7 +35,7 @@ A description of the various folders and functions contained within this directo
 #### [`report`](./docs/JNSRYA006_EEE4022S_RAV2023-03.pdf/)
 This is the submitted report for this project and contains an overview of the design and implementation procedure.
 
-#### [`report`](./docs/pipeline.pdf/)
+#### [`pipeline`](./docs/pipeline.pdf/)
 This is a PDF version of the MATLAB live-script. Known as the pipeline.
 
 ### [`functions`](./functions/)
@@ -91,6 +91,8 @@ In order to install and run this pipeline, the following steps need to be follow
 
 
 ## License
+This repository and all work herein are distributed under an MIT License.
 
 ## Contact
+For any issues or queries, please contact Ryan via [email](mailto:JNSRYA006@myuct.ac.za).
 
