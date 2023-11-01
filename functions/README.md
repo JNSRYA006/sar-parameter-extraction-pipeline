@@ -1,9 +1,7 @@
 # SAR Parameter Extraction Pipeline
 This directory contains the MATLAB code that was written for an undergraduate final-year project (EEE4022S) at the University of Cape Town. The aim of the project was to perform an initial investigation into designing a parameter extraction pipeline for SAR images to extract the sea ice characteristics of Antarctica.
 
-This folder contains all functions used in implementing the pipeline. The folder is broken down into three sub-folders, each containing the respective functions for the associated folder name. A description of the various folders and functions contained within this directory is given below. A visual representation of the pipeline is shown below.
-
-![Pipeline visual overview](./docs/pipelineOverview.png)
+This folder contains all functions used in implementing the pipeline. The folder is broken down into three sub-folders, each containing the respective functions for the associated folder name. A description of the various folders and functions contained within this directory is given below.
 
 #### [`/hasselmann`](./hasselmann)
 This folder contains all functions used in implementing the [Hasselmann and Hasselmann](https://agupubs.onlinelibrary.wiley.com/doi/10.1029/91JC00302) procedure and its inversion. These functions are implemented in the pipeline and can be individually run.
