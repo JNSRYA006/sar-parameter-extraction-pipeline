@@ -79,12 +79,15 @@ Installation differs depending on your OS. To install and compile wgrib2 for a d
 ### Installation
 In order to install and run this pipeline, the following steps need to be followed.
 1. Clone the repo
-2.
-
+2. Open MATLAB and navigate to the _sar-parameter-extraction-pipeline_ folder
+   
 ## Configuration
-
+1. Add **all folders and subfolders** to the path
 
 ## Usage
+1. Open [pipeline.mlx](./functions/pipeline.mlx/)
+2. Import pre-processed SAR data. Make sure the instructions in the Live-Script are followed.
+3. Run each section. Plots can be toggled on or off by the respective tick boxes.
 
 
 ## License
