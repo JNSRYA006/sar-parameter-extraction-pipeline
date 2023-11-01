@@ -32,21 +32,26 @@ A description of the various folders and functions contained within this directo
 ### [`docs`](./docs/)
 
 
-#### [`report`](./docs/report/)
+#### [`report`](./docs/JNSRYA006_EEE4022S_RAV2023-03.pdf/)
+This is the submitted report for this project and contains an overview of the design and implementation procedure.
 
+#### [`report`](./docs/pipeline.pdf/)
+This is a PDF version of the MATLAB live-script. Known as the pipeline.
 
 ### [`functions`](./functions/)
+This folder contains all functions used in implementing the pipeline. The folder is broken down into three sub-folders, each containing the respective functions for the associated folder name.
 
 #### [`hasselmann`](./functions/hasselmann)
+This folder contains all functions used in implementing the [Hasselmann and Hasselmann](https://agupubs.onlinelibrary.wiley.com/doi/10.1029/91JC00302) and its inversion. These functions are implemented in the pipeline and can be individually run.
 
 #### [`plotting`](./functions/plotting)
+This folder contains all functions used for generating plots of the respective spectra and validation plots.
 
 #### [`waveSpectra`](./functions/waveSpectra)
-
-
-### [`plots`](./plots/)
+This folder contains all functions used to generate the respective spectra used as an input to the Hasselmann and Hasselmann inversion procedure. Data used in generating these spectra can be obtained from [NOAA NCEP](https://nomads.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/).
 
 ### [`toolboxes`](./toolboxes/)
+This folder contains all external toolboxes utilised in the development of this pipeline. Namely, MMaps, and a JONSWAP wave generation spectrum, sourced from [Thor Fossen](https://github.com/cybergalactic/MSS).
 
 ## Getting Started
 
