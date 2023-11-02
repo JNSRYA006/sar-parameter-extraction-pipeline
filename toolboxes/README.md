@@ -1,10 +1,14 @@
 # SAR Parameter Extraction Pipeline
-This directory contains the associated documentation produced for an undergraduate final-year project (EEE4022S) at the University of Cape Town. The aim of the project was to design a parameter extraction pipeline for SAR images to extract the sea ice characteristics of Antarctica.
+This directory contains MATLAB toolboxes, and external functions used for an undergraduate final-year project (EEE4022S) at the University of Cape Town. The aim of the project was to perform an initial investigation into designing a parameter extraction pipeline for SAR images to extract the sea ice characteristics of Antarctica.
 
-A description of the various files contained within this directory is given below.
+This folder contains all toolboxes required in the implementation of the pipeline.
 
-#### [`report`](./JNSRYA006_EEE4022S_RAV2023-03.pdf/)
-This is the submitted report for this project and contains an overview of the design and implementation procedure.
+#### [`MMap`](/m_map)
+M_Map is a mapping package for MATLAB which allows data plots on different world maps.
+To use this toolbox, this folder needs to be added to the MATLAB path.
 
-#### [`pipeline`](./pipeline.pdf/)
-This is a PDF version of an unrun version of the MATLAB live-script. Known as the pipeline.
+#### [`MATLAB2Tikz`](/matlab2tikz-master/matlab2tikz-master)
+MATLAB2Tikz is a package which allows plots generated in MATLAB to be exported as a .tex file for high-quality plotting in LaTeX.
+
+##### [`wavespec`](./wavespec.m)
+This function was created by [Thor Fossen](https://github.com/cybergalactic/MSS) and allows multiple wave spectrum models to be generated. The model of interest was the JONSWAP wave model.
