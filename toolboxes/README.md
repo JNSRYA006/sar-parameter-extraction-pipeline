@@ -3,7 +3,7 @@ This directory contains MATLAB toolboxes, and external functions used for an und
 
 This folder contains all toolboxes required in the implementation of the pipeline.
 
-#### [`MMap`](/m_map)
+#### [`MMap`](/m_map/)
 M_Map is a mapping package for MATLAB which allows data plots on different world maps.
 To use this toolbox, this folder needs to be added to the MATLAB path.
 
