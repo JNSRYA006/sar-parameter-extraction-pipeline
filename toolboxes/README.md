@@ -3,11 +3,11 @@ This directory contains MATLAB toolboxes, and external functions used for an und
 
 This folder contains all toolboxes required in the implementation of the pipeline.
 
-#### [`MMap`](/m_map/)
+#### [`MMap`](https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/tree/main/toolboxes/m_map)
 M_Map is a mapping package for MATLAB which allows data plots on different world maps.
 To use this toolbox, this folder needs to be added to the MATLAB path.
 
-#### [`MATLAB2Tikz`](/matlab2tikz-master/matlab2tikz-master)
+#### [`MATLAB2Tikz`](https://github.com/JNSRYA006/sar-parameter-extraction-pipeline/tree/main/toolboxes/matlab2tikz-master/matlab2tikz-master)
 MATLAB2Tikz is a package which allows plots generated in MATLAB to be exported as a .tex file for high-quality plotting in LaTeX.
 
 ##### [`wavespec`](./wavespec.m)
